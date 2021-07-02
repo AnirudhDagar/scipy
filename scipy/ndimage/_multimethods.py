@@ -100,7 +100,6 @@ create_ndimage = functools.partial(create_multimethod, domain="numpy.scipy.ndima
 
 
 def _image_weights_arg_replacer(args, kwargs, dispatchables):
-    import pdb; pdb.set_trace();
     kw_out = kwargs.copy()
     if len(args)>0:
         return dispatchables[:2] + args[2:], kw_out
