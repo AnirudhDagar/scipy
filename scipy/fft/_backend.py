@@ -43,39 +43,9 @@ def _backend_from_arg(backend):
     return backend
 
 
-def set_global_backend(backend):
-    """Sets the global fft backend
-
-    The global backend has higher priority than registered backends, but lower
-    priority than context-specific backends set with `set_backend`.
-
-    Parameters
-    ----------
-    backend : {object, 'scipy'}
-        The backend to use.
-        Can either be a ``str`` containing the name of a known backend
-        {'scipy'} or an object that implements the uarray protocol.
-
-    Raises
-    ------
-    ValueError: If the backend does not implement ``numpy.scipy.fft``.
-
-    Notes
-    -----
-    This will overwrite the previously set global backend, which, by default, is
-    the SciPy implementation.
-
-    Examples
-    --------
-    We can set the global fft backend:
-
-    >>> from scipy.fft import fft, set_global_backend
-    >>> set_global_backend("scipy")  # Sets global backend. "scipy" is the default backend.
-    >>> fft([1])  # Calls the global backend
-    array([1.+0.j])
-    """
+def set_global_backend(backend, coerce=False, only=False, try_last=False):
     backend = _backend_from_arg(backend)
-    ua.set_global_backend(backend)
+    ua.set_global_backend(backend, coerce=coerce, only=only, try_last=try_last)
 
 
 def register_backend(backend):
@@ -177,4 +147,5 @@ def skip_backend(backend):
     return ua.skip_backend(backend)
 
 
-set_global_backend('scipy')
+set_global_backend('scipy', try_last=True)
+# ua.set_global_backend(_ScipyBackend, try_last=True)
