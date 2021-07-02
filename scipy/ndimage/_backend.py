@@ -16,7 +16,6 @@ class _ScipyImageBackend:
 
     @staticmethod
     def __ua_function__(method, args, kwargs):
-        import pdb; pdb.set_trace()
         fn = getattr(_api, method.__name__, None)
 
         if fn is None:

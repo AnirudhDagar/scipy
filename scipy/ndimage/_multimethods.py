@@ -102,9 +102,11 @@ create_ndimage = functools.partial(create_multimethod, domain="numpy.scipy.ndima
 def _image_weights_arg_replacer(args, kwargs, dispatchables):
     import pdb; pdb.set_trace();
     kw_out = kwargs.copy()
+    if len(args)>0:
+        return dispatchables[:2] + args[2:], kw_out
     if "output" in kw_out:
-        kw_out["output"] = dispatchables[4]
-    return (dispatchables[:1],) + args, kw_out
+        kw_out["output"] = dispatchables[-1]
+    return (dispatchables[:2],) + args, kw_out
 
 
 def _dispatch_image(func):
@@ -125,8 +127,7 @@ def _dispatch_image(func):
 @_dispatch_image
 @all_of_type(np.ndarray)
 def correlate1d(input, weights, axis=-1, output=None, mode="reflect", cval=0.0, origin=0):
-    import pdb; pdb.set_trace();
-    return input, weights, Dispatchable(output, np.ndarray, coercible=False)
+    return input, weights, mark_non_coercible(output)
 
 
 # # TODO: Add real docstring
