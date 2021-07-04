@@ -49,17 +49,29 @@ def _implements(scipy_func):
     return inner
 
 
-def _asarray(x):
-    """Convert scalars to a sequence, otherwise pass through ``x`` unchanged"""
-    if isinstance(x, Number) or isinstance(x, Sequence):
-        return cp.array(x)
-    return x
+# def _asarray(x):
+#     """Convert scalars to a sequence, otherwise pass through ``x`` unchanged"""
+#     if isinstance(x, Number) or isinstance(x, Sequence):
+#         return cp.array(x)
+#     return x
 
 
 @_implements(_scipy_ndimage.correlate1d)
 def correlate1d(input, weights, axis=-1, output=None, mode="reflect", cval=0.0,
                 origin=0):
-    weights = _asarray(weights)
     return _cupy_filters.correlate1d(
         input, weights, axis=axis, output=output, mode=mode, cval=cval, origin=origin)
 correlate1d.__doc__ = _cupy_filters.correlate1d.__doc__
+
+@_implements(_scipy_ndimage.convolve1d)
+def convolve1d(input, weights, axis=-1, output=None, mode="reflect", cval=0.0,
+                origin=0):
+    return _cupy_filters.convolve1d(
+        input, weights, axis=axis, output=output, mode=mode, cval=cval, origin=origin)
+convolve1d.__doc__ = _cupy_filters.convolve1d.__doc__
+
+@_implements(_scipy_ndimage.gaussian_filter1d)
+def gaussian_filter1d(input, sigma, axis=-1, order=0, output=None, mode="reflect", cval=0.0, truncate=4.0):
+    return _cupy_filters.gaussian_filter1d(
+        input, sigma, axis=axis, order=order, output=output, mode=mode, cval=cval, truncate=truncate)
+gaussian_filter1d.__doc__ = _cupy_filters.gaussian_filter1d.__doc__
