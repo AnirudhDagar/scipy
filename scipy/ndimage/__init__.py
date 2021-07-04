@@ -160,7 +160,7 @@ Backend control
 
 # TODO: import these from multimethods
 from .filters import *
-from ._multimethods import correlate1d
+from ._multimethods import correlate1d, convolve1d, gaussian_filter1d
 from .interpolation import *
 from .measurements import *
 from .morphology import *
