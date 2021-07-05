@@ -11,6 +11,8 @@ class _ScipyImageBackend:
     future, ``uarray`` will treat the domain as a hierarchy. This means the
     user can install a single backend for ``numpy`` and have it implement
     ``numpy.scipy.ndimage`` as well.
+
+    .. versionadded:: 1.8.0
     """
     __ua_domain__ = "numpy.scipy.ndimage"
 
@@ -74,6 +76,8 @@ def set_global_backend(backend, coerce=False, only=False, try_last=False):
     This will overwrite the previously set global backend, which, by default,
     is the SciPy implementation.
 
+    .. versionadded:: 1.8.0
+
     Examples
     --------
     We can set the global ndimage backend:
@@ -105,6 +109,8 @@ def register_backend(backend):
     ------
     ValueError: If the backend does not implement ``numpy.scipy.ndimage``.
 
+    .. versionadded:: 1.8.0
+
     Examples
     --------
     We can register a new ndimage backend:
@@ -121,7 +127,6 @@ def register_backend(backend):
     >>> # returns `NotImplemented`
     array([ 0,  2,  6,  9, 13, 16, 20, 23, 27, 30])
     >>> set_global_backend("scipy")  # Restore global backend to default
-
     """
     backend = _backend_from_arg(backend)
     ua.register_backend(backend)
@@ -147,6 +152,8 @@ def set_backend(backend, coerce=False, only=False):
         If only is ``True`` and this backend returns ``NotImplemented``, then a
         BackendNotImplemented error will be raised immediately. Ignoring any
         lower priority backends.
+
+    .. versionadded:: 1.8.0
 
     Examples
     -------- 
@@ -174,6 +181,8 @@ def skip_backend(backend):
         Can either be a ``str`` containing the name of a known backend
         {'scipy'} or an object that implements the uarray protocol.
 
+    .. versionadded:: 1.8.0
+
     Examples
     --------
     >>> import scipy.ndimage as ndimage
@@ -185,7 +194,7 @@ def skip_backend(backend):
     ...     ndimage.correlate(np.arange(10), [1, 2.5])
     Traceback (most recent call last):
         ...
-    BackendNotImplementedError: No selected backends had an implementation ...
+    BackendNotImplementedError: No selected backends had an implementation ...    
     """
     backend = _backend_from_arg(backend)
     return ua.skip_backend(backend)
