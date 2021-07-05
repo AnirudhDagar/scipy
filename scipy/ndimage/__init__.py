@@ -158,13 +158,7 @@ Backend control
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# TODO: import these from multimethods
-from .filters import *
-from ._multimethods import correlate1d, convolve1d, gaussian_filter1d
-from .interpolation import *
-from .measurements import *
-from .morphology import *
-
+from ._multimethods import *
 from ._backend import *
 
 __version__ = '2.0'
