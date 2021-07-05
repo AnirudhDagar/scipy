@@ -15,18 +15,6 @@ create_ndimage = functools.partial(create_multimethod, domain="numpy.scipy.ndima
 #     return inner
 
 
-# reference from scipy.fft
-# def _x_replacer(args, kwargs, dispatchables):
-#     """
-#     uarray argument replacer to replace the transform input array (``x``)
-#     """
-#     if len(args) > 0:
-#         return (dispatchables[0],) + args[1:], kwargs
-#     kw = kwargs.copy()
-#     kw['x'] = dispatchables[0]
-#     return args, kw
-
-
 def _identity_arg_replacer(args, kwargs, arrays):
     def self_method(*args, **kwargs):
         return args, kwargs
@@ -35,26 +23,24 @@ def _identity_arg_replacer(args, kwargs, arrays):
 
 def _input_arg_replacer(args, kwargs, dispatchables):
     """
-    uarray argument replacer to replace the input array and weights
+    uarray argument replacer to replace the input array
+    and optional output kwarg.
     """
     def self_method(input, *args, **kwargs):
         kw_out = kwargs.copy()
-        print(len(args), len(kw_out))
-        # import pdb; pdb.set_trace()
         if "output" in kw_out:
             kw_out["output"] = dispatchables[1]
         return (dispatchables[0],) + args, kw_out
     return self_method(*args, **kwargs)
 
 
-def _input_weights_arg_replacer(args, kwargs, dispatchables):
+def _double_input_arg_replacer(args, kwargs, dispatchables):
     """
-    uarray argument replacer to replace the input array and weights
+    uarray argument replacer to replace two required input arrays
+    and optional output kwarg.
     """
-    def self_method(input, weights, *args, **kwargs):
+    def self_method(input1, input2, *args, **kwargs):
         kw_out = kwargs.copy()
-        print(len(args), len(kw_out))
-        # import pdb; pdb.set_trace()
         if "output" in kw_out:
             kw_out["output"] = dispatchables[2]
         return dispatchables[:2], kw_out
@@ -63,12 +49,11 @@ def _input_weights_arg_replacer(args, kwargs, dispatchables):
 
 def _input_footprint_arg_replacer(args, kwargs, dispatchables):
     """
-    uarray argument replacer to replace the input image (``image``) and
+    uarray argument replacer to replace the input array
+    and optional footprint and output kwargs.
     """
     def self_method(input, *args, **kwargs):
         kw_out = kwargs.copy()
-        print(len(args), len(kw_out))
-        # import pdb; pdb.set_trace()
         if "footprint" in kw_out:
             kw_out["footprint"] = dispatchables[1]
         if "output" in kw_out:
@@ -77,17 +62,16 @@ def _input_footprint_arg_replacer(args, kwargs, dispatchables):
     return self_method(*args, **kwargs)
 
 
-def _input_labels_index_arg_replacer(args, kwargs, dispatchables):
+def _input_structure_arg_replacer(args, kwargs, dispatchables):
     """
-    uarray argument replacer to replace the input image (``image``) and
+    uarray argument replacer to replace the input array
+    and optional structure and output kwargs.
     """
     def self_method(input, *args, **kwargs):
         kw_out = kwargs.copy()
-        print(len(args), len(kw_out))
-        # import pdb; pdb.set_trace()
-        if "labels" in kw_out:
-            kw_out["footprint"] = dispatchables[1]
-        if "index" in kw_out:
+        if "structure" in kw_out:
+            kw_out["structure"] = dispatchables[1]
+        if "output" in kw_out:
             kw_out["output"] = dispatchables[2]
         return (dispatchables[0],) + args, kw_out
     return self_method(*args, **kwargs)
@@ -95,12 +79,11 @@ def _input_labels_index_arg_replacer(args, kwargs, dispatchables):
 
 def _input_structure_mask_arg_replacer(args, kwargs, dispatchables):
     """
-    uarray argument replacer to replace the input image (``image``) and
+    uarray argument replacer to replace the input array
+    and optional structure, mask and output kwargs.
     """
     def self_method(input, *args, **kwargs):
         kw_out = kwargs.copy()
-        print(len(args), len(kw_out))
-        # import pdb; pdb.set_trace()
         if "structure" in kw_out:
             kw_out["structure"] = dispatchables[1]
         if "mask" in kw_out:
@@ -113,12 +96,11 @@ def _input_structure_mask_arg_replacer(args, kwargs, dispatchables):
 
 def _input_structure1_structure2_arg_replacer(args, kwargs, dispatchables):
     """
-    uarray argument replacer to replace the input image (``image``) and
+    uarray argument replacer to replace the input array
+    and optional structure1, structure2 and output kwargs.
     """
     def self_method(input, *args, **kwargs):
         kw_out = kwargs.copy()
-        print(len(args), len(kw_out))
-        # import pdb; pdb.set_trace()
         if "structure1" in kw_out:
             kw_out["structure1"] = dispatchables[1]
         if "structure2" in kw_out:
@@ -129,30 +111,13 @@ def _input_structure1_structure2_arg_replacer(args, kwargs, dispatchables):
     return self_method(*args, **kwargs)
 
 
-def _input_structure_arg_replacer(args, kwargs, dispatchables):
-    """
-    uarray argument replacer to replace the input image (``image``) and
-    """
-    def self_method(input, *args, **kwargs):
-        kw_out = kwargs.copy()
-        print(len(args), len(kw_out))
-        # import pdb; pdb.set_trace()
-        if "structure" in kw_out:
-            kw_out["structure"] = dispatchables[1]
-        if "output" in kw_out:
-            kw_out["output"] = dispatchables[2]
-        return (dispatchables[0],) + args, kw_out
-    return self_method(*args, **kwargs)
-
-
 def _input_footprint_structure_arg_replacer(args, kwargs, dispatchables):
     """
-    uarray argument replacer to replace the input image (``image``) and
+    uarray argument replacer to replace the input array
+    and optional footprint, structure and output kwargs.
     """
     def self_method(input, *args, **kwargs):
         kw_out = kwargs.copy()
-        print(len(args), len(kw_out))
-        # import pdb; pdb.set_trace()
         if "footprint" in kw_out:
             kw_out["footprint"] = dispatchables[1]
         if "structure" in kw_out:
@@ -165,13 +130,11 @@ def _input_footprint_structure_arg_replacer(args, kwargs, dispatchables):
 
 def _input_markers_arg_replacer(args, kwargs, dispatchables):
     """
-    uarray argument replacer to replace the input image (``image``) and
+    uarray argument replacer to replace the input and markers array.
+    Optional structure and output kwargs are also handled.
     """
     def self_method(input, markers, *args, **kwargs):
         kw_out = kwargs.copy()
-        print(len(args), len(kw_out))
-        # import pdb; pdb.set_trace()
-        # input, markers, structure=None, output=None
         if "structure" in kw_out:
             kw_out["structure"] = dispatchables[2]
         if "output" in kw_out:
@@ -180,19 +143,34 @@ def _input_markers_arg_replacer(args, kwargs, dispatchables):
     return self_method(*args, **kwargs)
 
 
+def _input_labels_index_arg_replacer(args, kwargs, dispatchables):
+    """
+    uarray argument replacer to replace the input array and
+    optional labels and index kwargs.
+    """
+    def self_method(input, *args, **kwargs):
+        kw_out = kwargs.copy()
+        if "labels" in kw_out:
+            kw_out["labels"] = dispatchables[1]
+        if "index" in kw_out:
+            kw_out["index"] = dispatchables[2]
+        return (dispatchables[0],) + args, kw_out
+    return self_method(*args, **kwargs)
+
+
 ############################################
 """ filters multimethods """
 ############################################
 
 
-@create_ndimage(_input_weights_arg_replacer)
+@create_ndimage(_double_input_arg_replacer)
 @all_of_type(np.ndarray)
 def correlate1d(input, weights, axis=-1, output=None, mode="reflect", cval=0.0, origin=0):
     return input, weights, mark_non_coercible(output)
 correlate1d.__doc__ = _api.correlate1d.__doc__
 
 
-@create_ndimage(_input_weights_arg_replacer)
+@create_ndimage(_double_input_arg_replacer)
 @all_of_type(np.ndarray)
 def convolve1d(input, weights, axis=-1, output=None, mode="reflect", cval=0.0, origin=0):
     return input, weights, mark_non_coercible(output)
@@ -269,7 +247,7 @@ def gaussian_gradient_magnitude(input, sigma, output=None,
 gaussian_gradient_magnitude.__doc__ = _api.gaussian_gradient_magnitude.__doc__
 
 
-@create_ndimage(_input_weights_arg_replacer)
+@create_ndimage(_double_input_arg_replacer)
 @all_of_type(np.ndarray)
 def correlate(input, weights, output=None, mode='reflect', cval=0.0,
               origin=0):
@@ -277,7 +255,7 @@ def correlate(input, weights, output=None, mode='reflect', cval=0.0,
 correlate.__doc__ = _api.correlate.__doc__
 
 
-@create_ndimage(_input_weights_arg_replacer)
+@create_ndimage(_double_input_arg_replacer)
 @all_of_type(np.ndarray)
 def convolve(input, weights, output=None, mode='reflect', cval=0.0,
              origin=0):
@@ -354,7 +332,7 @@ median_filter.__doc__ = _api.median_filter.__doc__
 def percentile_filter(input, percentile, size=None, footprint=None,
                       output=None, mode="reflect", cval=0.0, origin=0):
     return input, footprint, mark_non_coercible(output)
-median_filter.__doc__ = _api.median_filter.__doc__
+percentile_filter.__doc__ = _api.percentile_filter.__doc__
 
 
 @create_ndimage(_input_arg_replacer)
@@ -363,6 +341,7 @@ def generic_filter1d(input, function, filter_size, axis=-1,
                      output=None, mode="reflect", cval=0.0, origin=0,
                      extra_arguments=(), extra_keywords=None):
     return input, mark_non_coercible(output)
+generic_filter1d.__doc__ = _api.generic_filter1d.__doc__
 
 
 @create_ndimage(_input_footprint_arg_replacer)
@@ -371,6 +350,7 @@ def generic_filter(input, function, size=None, footprint=None,
                    output=None, mode="reflect", cval=0.0, origin=0,
                    extra_arguments=(), extra_keywords=None):
     return input, footprint, mark_non_coercible(output)
+generic_filter.__doc__ = _api.generic_filter.__doc__
 
 
 ############################################
@@ -406,8 +386,6 @@ def fourier_shift(input, shift, n=-1, axis=-1, output=None):
 """ interpolation multimethods """
 ############################################
 
-# ------------------------------------------------------
-# NOTE: Check these because of dtype defaults.
 
 @create_ndimage(_input_arg_replacer)
 @all_of_type(np.ndarray)
@@ -421,9 +399,7 @@ def spline_filter1d(input, order=3, axis=-1, output=np.float64,
 def spline_filter(input, order=3, output=np.float64, mode='mirror'):
     return input, mark_non_coercible(output)
 
-# ------------------------------------------------------
- 
-# NOTE: DOESN'T EXIST IN CUPY
+
 @create_ndimage(_input_arg_replacer)
 @all_of_type(np.ndarray)
 def geometric_transform(input, mapping, output_shape=None,
@@ -432,7 +408,6 @@ def geometric_transform(input, mapping, output_shape=None,
                         extra_arguments=(), extra_keywords={}):
     return input, mark_non_coercible(output)
 
-# ------------------------------------------------------
 
 @create_ndimage(_input_arg_replacer)
 @all_of_type(np.ndarray)
@@ -441,7 +416,7 @@ def map_coordinates(input, coordinates, output=None, order=3,
     return input, mark_non_coercible(output)
 
 
-@create_ndimage(_input_weights_arg_replacer)
+@create_ndimage(_double_input_arg_replacer)
 @all_of_type(np.ndarray)
 def affine_transform(input, matrix, offset=0.0, output_shape=None,
                      output=None, order=3, mode='constant',
@@ -475,13 +450,10 @@ def rotate(input, angle, axes=(1, 0), reshape=True, output=None, order=3,
 ############################################
 
 
-# ------------------------------------------------------
-# TODO: test acche se qki structure is array like but not
-# ndarray toh usko dispatchable nhi banana hoga mostly
-@create_ndimage(_input_arg_replacer)
+@create_ndimage(_input_structure_arg_replacer)
 @all_of_type(np.ndarray)
 def label(input, structure=None, output=None):
-    return input, mark_non_coercible(output)
+    return input, structure, mark_non_coercible(output)
 
 
 @create_ndimage(_input_arg_replacer)
@@ -574,7 +546,6 @@ def histogram(input, min, max, bins, labels=None, index=None):
     return input, labels, index
 
 
-# NOTE: Not in CuPy currently
 @create_ndimage(_input_markers_arg_replacer)
 @all_of_type(np.ndarray)
 def watershed_ift(input, markers, structure=None, output=None):
@@ -724,25 +695,3 @@ def distance_transform_cdt(input, metric='chessboard', return_distances=True,
 def distance_transform_edt(input, sampling=None, return_distances=True,
                            return_indices=False, distances=None, indices=None):
     return (input,)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

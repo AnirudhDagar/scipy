@@ -8,8 +8,8 @@ class _ScipyImageBackend:
     Notes
     -----
     We use the domain ``numpy.scipy`` rather than ``scipy`` because in the
-    future, ``uarray`` will treat the domain as a hierarchy. This means the user
-    can install a single backend for ``numpy`` and have it implement
+    future, ``uarray`` will treat the domain as a hierarchy. This means the
+    user can install a single backend for ``numpy`` and have it implement
     ``numpy.scipy.ndimage`` as well.
     """
     __ua_domain__ = "numpy.scipy.ndimage"
@@ -71,15 +71,15 @@ def set_global_backend(backend, coerce=False, only=False, try_last=False):
 
     Notes
     -----
-    This will overwrite the previously set global backend, which, by default, is
-    the SciPy implementation.
+    This will overwrite the previously set global backend, which, by default,
+    is the SciPy implementation.
 
     Examples
     --------
     We can set the global ndimage backend:
 
     >>> from scipy.ndimage import correlate, set_global_backend
-    >>> set_global_backend("scipy")  # Sets global backend. "scipy" is the default backend.
+    >>> set_global_backend("scipy")  # Sets global backend.
     >>> correlate(np.arange(10), [1, 2.5])  # Calls the global backend
     array([ 0,  2,  6,  9, 13, 16, 20, 23, 27, 30])
     """
@@ -115,7 +115,9 @@ def register_backend(backend):
     ...          return NotImplemented
     >>> set_global_backend(NoopBackend())  # Set the invalid backend as global
     >>> register_backend("scipy")  # Register a new backend
-    >>> correlate(np.arange(10), [1, 2.5])  # The registered backend is called because the global backend returns `NotImplemented`
+    >>> correlate(np.arange(10), [1, 2.5])
+    >>> # The registered backend is called because the global backend
+    >>> # returns `NotImplemented`
     array([ 0,  2,  6,  9, 13, 16, 20, 23, 27, 30])
     >>> set_global_backend("scipy")  # Restore global backend to default
 

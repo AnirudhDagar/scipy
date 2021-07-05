@@ -20,10 +20,12 @@ def __ua_convert__(dispatchables, coerce):
         except TypeError:
             return NotImplemented
     elif dispatchables == None:
+        # handling for no dispatchables
         replaced = []
     else:
         replaced = [d.value for d in dispatchables]
 
+    # TODO: Uncomment to ask for help
     # if not all(d.type is not np.ndarray or isinstance(r, cp.ndarray)
     #            for r, d in zip(replaced, dispatchables)):
     #     return NotImplemented
@@ -194,5 +196,18 @@ minimum_filter.__doc__ = _cupy_ndimage.minimum_filter.__doc__
 
 @_implements(_scipy_ndimage.fourier_gaussian)
 def fourier_gaussian(input, sigma, n=-1, axis=-1, output=None):
-    return _cupy_ndimage.generate_binary_structure(input, sigma, n=n, axis=axis, output=output)
+    return _cupy_ndimage.fourier_gaussian(input, sigma, n=n, axis=axis, output=output)
 fourier_gaussian.__doc__ = _cupy_ndimage.fourier_gaussian.__doc__
+
+
+@_implements(_scipy_ndimage.gaussian_gradient_magnitude)
+def gaussian_gradient_magnitude(input, sigma, output=None,
+                                mode="reflect", cval=0.0, **kwargs):
+    return _cupy_ndimage.gaussian_gradient_magnitude(input, sigma=sigma, output=output, mode=mode, cval=cval, **kwargs)
+gaussian_gradient_magnitude.__doc__ = _cupy_ndimage.gaussian_gradient_magnitude.__doc__
+
+
+@_implements(_scipy_ndimage.spline_filter)
+def spline_filter(input, order=3, output=np.float64, mode='mirror'):
+    return _cupy_ndimage.spline_filter(input, order=order, output=output, mode=mode)
+spline_filter.__doc__ = _cupy_ndimage.spline_filter.__doc__
