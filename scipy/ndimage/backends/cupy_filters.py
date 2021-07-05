@@ -211,3 +211,8 @@ gaussian_gradient_magnitude.__doc__ = _cupy_ndimage.gaussian_gradient_magnitude.
 def spline_filter(input, order=3, output=np.float64, mode='mirror'):
     return _cupy_ndimage.spline_filter(input, order=order, output=output, mode=mode)
 spline_filter.__doc__ = _cupy_ndimage.spline_filter.__doc__
+
+@_implements(_scipy_ndimage.variance)
+def variance(input, labels=None, index=None):
+    return _cupy_ndimage.variance(input, labels=labels, index=index)
+variance.__doc__ = _cupy_ndimage.variance.__doc__
