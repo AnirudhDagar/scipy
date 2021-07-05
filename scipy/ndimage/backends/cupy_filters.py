@@ -216,3 +216,17 @@ spline_filter.__doc__ = _cupy_ndimage.spline_filter.__doc__
 def variance(input, labels=None, index=None):
     return _cupy_ndimage.variance(input, labels=labels, index=index)
 variance.__doc__ = _cupy_ndimage.variance.__doc__
+
+@_implements(_scipy_ndimage.binary_closing)
+def binary_closing(input, structure=None, iterations=1, output=None,
+                   origin=0, mask=None, border_value=0, brute_force=False):
+    return _cupy_ndimage.binary_closing(input, structure=structure, iterations=iterations,
+        output=output, origin=origin, mask=mask, border_value=border_value, brute_force=brute_force)
+binary_closing.__doc__ = _cupy_ndimage.binary_closing.__doc__
+
+@_implements(_scipy_ndimage.binary_hit_or_miss)
+def binary_hit_or_miss(input, structure1=None, structure2=None,
+                       output=None, origin1=0, origin2=None):
+    return _cupy_ndimage.binary_hit_or_miss(input, structure1=structure1, structure2=structure2,
+        output=output, origin1=origin1, origin2=origin2)
+binary_hit_or_miss.__doc__ = _cupy_ndimage.binary_hit_or_miss.__doc__
