@@ -5,11 +5,17 @@ from scipy.ndimage import _api
 
 
 mark_non_coercible = lambda x: Dispatchable(x, np.ndarray, coercible=False)
-create_ndimage = functools.partial(create_multimethod, domain="numpy.scipy.ndimage")
+create_ndimage = functools.partial(create_multimethod,
+                                   domain="numpy.scipy.ndimage")
+
 
 def _get_docs(func):
-    """Decorator to take the docstring from original function and assign to the multimethod"""
+    """
+    Decorator to take the docstring from original
+    function and assign to the multimethod.
+    """
     func.__doc__ = getattr(_api, func.__name__).__doc__
+
     @functools.wraps(func)
     def inner(*args, **kwargs):
         return func(*args, **kwargs)
@@ -18,7 +24,7 @@ def _get_docs(func):
 
 def _identity_arg_replacer(args, kwargs, arrays):
     """
-    uarray argument replacer when no dispatchables are available.
+    uarray argument replacer when dispatchables are empty.
     """
     def self_method(*args, **kwargs):
         return args, kwargs
@@ -169,14 +175,16 @@ def _input_labels_index_arg_replacer(args, kwargs, dispatchables):
 @create_ndimage(_double_input_arg_replacer)
 @all_of_type(np.ndarray)
 @_get_docs
-def correlate1d(input, weights, axis=-1, output=None, mode="reflect", cval=0.0, origin=0):
+def correlate1d(input, weights, axis=-1, output=None,
+                mode="reflect", cval=0.0, origin=0):
     return input, weights, mark_non_coercible(output)
 
 
 @create_ndimage(_double_input_arg_replacer)
 @all_of_type(np.ndarray)
 @_get_docs
-def convolve1d(input, weights, axis=-1, output=None, mode="reflect", cval=0.0, origin=0):
+def convolve1d(input, weights, axis=-1, output=None,
+               mode="reflect", cval=0.0, origin=0):
     return input, weights, mark_non_coercible(output)
 
 
@@ -213,8 +221,8 @@ def sobel(input, axis=-1, output=None, mode="reflect", cval=0.0):
 @create_ndimage(_input_arg_replacer)
 @all_of_type(np.ndarray)
 @_get_docs
-def generic_laplace(input, derivative2, output=None, mode="reflect", cval=0.0,
-                    extra_arguments=(), extra_keywords=None):
+def generic_laplace(input, derivative2, output=None, mode="reflect",
+                    cval=0.0, extra_arguments=(), extra_keywords=None):
     return input, mark_non_coercible(output)
 
 
@@ -495,6 +503,7 @@ def sum_labels(input, labels=None, index=None):
 
 
 # alias for sum_labels; kept for backward compatibility
+@_get_docs
 def sum(input, labels=None, index=None):
     return sum_labels(input, labels=labels, index=index)
 
