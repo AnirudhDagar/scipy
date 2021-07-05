@@ -11,7 +11,7 @@ import pytest
 from pytest import raises as assert_raises
 
 from scipy import ndimage
-from scipy.ndimage.filters import _gaussian_kernel1d, rank_filter
+from scipy.ndimage.filters import _gaussian_kernel1d
 
 from . import types, float_types, complex_types
 
