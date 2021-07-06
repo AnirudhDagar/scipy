@@ -26,7 +26,7 @@ class _ScipyImageBackend:
 
 
 _named_backends = {
-    'scipy_image': _ScipyImageBackend,
+    'scipy': _ScipyImageBackend,
 }
 
 
@@ -109,13 +109,15 @@ def register_backend(backend):
     ------
     ValueError: If the backend does not implement ``numpy.scipy.ndimage``.
 
+    Notes
+    -----
     .. versionadded:: 1.8.0
 
     Examples
     --------
     We can register a new ndimage backend:
-    >>> from scipy.ndimage import (correlate, register_backend,
-                                   set_global_backend)
+
+    >>> from scipy.ndimage import correlate, register_backend set_global_backend
     >>> class NoopBackend:  # Define an invalid Backend
     ...     __ua_domain__ = "numpy.scipy.ndimage"
     ...     def __ua_function__(self, func, args, kwargs):
@@ -127,13 +129,15 @@ def register_backend(backend):
     >>> # returns `NotImplemented`
     array([ 0,  2,  6,  9, 13, 16, 20, 23, 27, 30])
     >>> set_global_backend("scipy")  # Restore global backend to default
+
     """
     backend = _backend_from_arg(backend)
     ua.register_backend(backend)
 
 
 def set_backend(backend, coerce=False, only=False):
-    """Context manager to set the backend within a fixed scope.
+    """
+    Context manager to set the backend within a fixed scope.
 
     Upon entering the ``with`` statement, the given backend will be added to
     the list of available backends with the highest priority. Upon exit, the
@@ -153,15 +157,17 @@ def set_backend(backend, coerce=False, only=False):
         BackendNotImplemented error will be raised immediately. Ignoring any
         lower priority backends.
 
+    Notes
+    -----
     .. versionadded:: 1.8.0
 
     Examples
     --------
     >>> import scipy.ndimage as ndimage
     >>> with ndimage.set_backend('scipy', only=True):
-            # Always calls the scipy implementation
-    ...     ndimage.correlate(np.arange(10), [1, 2.5])
+    ...     ndimage.correlate(np.arange(10), [1, 2.5]) # Always calls the scipy implementation
     array([ 0,  2,  6,  9, 13, 16, 20, 23, 27, 30])
+
     """
     backend = _backend_from_arg(backend)
     return ua.set_backend(backend, coerce=coerce, only=only)
@@ -181,16 +187,16 @@ def skip_backend(backend):
         Can either be a ``str`` containing the name of a known backend
         {'scipy'} or an object that implements the uarray protocol.
 
+    Notes
+    -----
     .. versionadded:: 1.8.0
 
     Examples
     --------
     >>> import scipy.ndimage as ndimage
-    >>> # Calls default SciPy backend
-    >>> ndimage.correlate(np.arange(10), [1, 2.5])
+    >>> ndimage.correlate(np.arange(10), [1, 2.5])  # Calls default SciPy backend
     array([ 0,  2,  6,  9, 13, 16, 20, 23, 27, 30])
-    >>> # Explicitly skip SciPy backend, leaving no implementation available
-    >>> with ndimage.skip_backend('scipy'):
+    >>> with ndimage.skip_backend('scipy'):  # Explicitly skip SciPy backend, leaving no implementation available
     ...     ndimage.correlate(np.arange(10), [1, 2.5])
     Traceback (most recent call last):
         ...
@@ -200,4 +206,4 @@ def skip_backend(backend):
     return ua.skip_backend(backend)
 
 
-set_global_backend('scipy_image', try_last=True)
+set_global_backend('scipy', try_last=True)
