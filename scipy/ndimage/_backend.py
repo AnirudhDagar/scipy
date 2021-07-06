@@ -123,9 +123,7 @@ def register_backend(backend):
     ...          return NotImplemented
     >>> set_global_backend(NoopBackend())  # Set the invalid backend as global
     >>> register_backend("scipy")  # Register a new backend
-    >>> correlate(np.arange(10), [1, 2.5])
-    >>> # The registered backend is called because the global backend
-    >>> # returns `NotImplemented`
+    >>> correlate(np.arange(10), [1, 2.5])  # The registered backend is called because the global backend returns `NotImplemented`
     array([ 0,  2,  6,  9, 13, 16, 20, 23, 27, 30])
     >>> set_global_backend("scipy")  # Restore global backend to default
 
