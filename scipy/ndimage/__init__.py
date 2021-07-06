@@ -116,6 +116,16 @@ Morphology
    morphological_laplace
    white_tophat
 
+Backend control
+===============
+.. autosummary::
+   :toctree: generated/
+
+   set_backend - Context manager to set the backend within a fixed scope
+   skip_backend - Context manager to skip a backend within a fixed scope
+   set_global_backend - Sets the global ndimage backend
+   register_backend - Register a backend for permanent use
+
 """
 
 # Copyright (C) 2003-2005 Peter J. Verveer
@@ -153,6 +163,7 @@ from ._fourier import *  # noqa: F401 F403
 from ._interpolation import *  # noqa: F401 F403
 from ._measurements import *  # noqa: F401 F403
 from ._morphology import *  # noqa: F401 F403
+from ._backend import *  # noqa: F401 F403
 from . import filters  # noqa: F401
 from . import fourier  # noqa: F401
 from . import interpolation  # noqa: F401
@@ -161,7 +172,29 @@ from . import morphology  # noqa: F401
 
 __version__ = '2.0'
 
-__all__ = [s for s in dir() if not s.startswith('_')]
+__all__ = ['affine_transform', 'binary_closing', 'binary_dilation',
+           'binary_erosion', 'binary_fill_holes', 'binary_hit_or_miss',
+           'binary_opening', 'binary_propagation', 'black_tophat',
+           'center_of_mass', 'convolve', 'convolve1d', 'correlate',
+           'correlate1d', 'distance_transform_bf', 'distance_transform_cdt',
+           'distance_transform_edt', 'extrema', 'find_objects',
+           'fourier_ellipsoid', 'fourier_gaussian', 'fourier_shift',
+           'fourier_uniform', 'gaussian_filter', 'gaussian_filter1d',
+           'gaussian_gradient_magnitude', 'gaussian_laplace',
+           'generate_binary_structure', 'generic_filter', 'generic_filter1d',
+           'generic_gradient_magnitude', 'generic_laplace',
+           'geometric_transform', 'grey_closing', 'grey_dilation',
+           'grey_erosion', 'grey_opening', 'histogram', 'iterate_structure',
+           'label', 'labeled_comprehension', 'laplace', 'map_coordinates',
+           'maximum', 'maximum_filter', 'maximum_filter1d', 'maximum_position',
+           'mean', 'median', 'median_filter', 'minimum', 'minimum_filter',
+           'minimum_filter1d', 'minimum_position', 'morphological_gradient',
+           'morphological_laplace', 'percentile_filter', 'prewitt',
+           'rank_filter', 'register_backend', 'rotate', 'set_backend',
+           'set_global_backend', 'skip_backend', 'shift', 'sobel',
+           'spline_filter', 'spline_filter1d', 'standard_deviation', 'sum',
+           'sum_labels', 'uniform_filter', 'uniform_filter1d', 'variance',
+           'watershed_ift', 'white_tophat', 'zoom']
 
 from scipy._lib._testutils import PytestTester
 test = PytestTester(__name__)
