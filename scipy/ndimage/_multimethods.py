@@ -63,7 +63,6 @@ def _input_footprint_arg_replacer(args, kwargs, dispatchables):
     return self_method(*args, **kwargs)
 
 
-
 ############################################
 """ filters multimethods """
 ############################################
@@ -259,3 +258,35 @@ def generic_filter(input, function, size=None, footprint=None,
                    extra_arguments=(), extra_keywords=None):
     return input, footprint, mark_non_coercible(output)
 
+
+############################################
+""" fourier multimethods """
+############################################
+
+
+@create_ndimage(_input_arg_replacer)
+@all_of_type(np.ndarray)
+@_get_docs
+def fourier_gaussian(input, sigma, n=-1, axis=-1, output=None):
+    return input, mark_non_coercible(output)
+
+
+@create_ndimage(_input_arg_replacer)
+@all_of_type(np.ndarray)
+@_get_docs
+def fourier_uniform(input, size, n=-1, axis=-1, output=None):
+    return input, mark_non_coercible(output)
+
+
+@create_ndimage(_input_arg_replacer)
+@all_of_type(np.ndarray)
+@_get_docs
+def fourier_ellipsoid(input, size, n=-1, axis=-1, output=None):
+    return input, mark_non_coercible(output)
+
+
+@create_ndimage(_input_arg_replacer)
+@all_of_type(np.ndarray)
+@_get_docs
+def fourier_shift(input, shift, n=-1, axis=-1, output=None):
+    return input, mark_non_coercible(output)
