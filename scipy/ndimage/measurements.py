@@ -939,7 +939,7 @@ def minimum(input, labels=None, index=None):
     Notes
     -----
     The function returns a Python list and not a NumPy array, use
-    `np.array` to convert the list to an array.
+    ``np.array`` to convert the list to an array.
 
     Examples
     --------
@@ -1001,7 +1001,7 @@ def maximum(input, labels=None, index=None):
     Notes
     -----
     The function returns a Python list and not a NumPy array, use
-    `np.array` to convert the list to an array.
+    ``np.array`` to convert the list to an array.
 
     Examples
     --------
@@ -1079,7 +1079,7 @@ def median(input, labels=None, index=None):
     Notes
     -----
     The function returns a Python list and not a NumPy array, use
-    `np.array` to convert the list to an array.
+    ``np.array`` to convert the list to an array.
 
     Examples
     --------
