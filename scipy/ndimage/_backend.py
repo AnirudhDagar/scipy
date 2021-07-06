@@ -117,7 +117,7 @@ def register_backend(backend):
     --------
     We can register a new ndimage backend:
 
-    >>> from scipy.ndimage import correlate, register_backend set_global_backend
+    >>> from scipy.ndimage import correlate, register_backend, set_global_backend
     >>> class NoopBackend:  # Define an invalid Backend
     ...     __ua_domain__ = "numpy.scipy.ndimage"
     ...     def __ua_function__(self, func, args, kwargs):
