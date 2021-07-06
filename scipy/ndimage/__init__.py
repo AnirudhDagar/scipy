@@ -163,6 +163,7 @@ from ._fourier import *
 from ._interpolation import *
 from ._measurements import *
 from ._morphology import *
+from ._multimethods import *
 from ._backend import *
 
 __version__ = '2.0'
