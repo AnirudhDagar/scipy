@@ -7,10 +7,9 @@ class _ScipyImageBackend:
 
     Notes
     -----
-    We use the domain ``numpy.scipy`` rather than ``scipy`` because in the
-    future, ``uarray`` will treat the domain as a hierarchy. This means the
-    user can install a single backend for ``numpy`` and have it implement
-    ``numpy.scipy.ndimage`` as well.
+    We use the domain ``numpy.scipy`` rather than ``scipy`` because ``uarray``
+    treats the domain as a hierarchy. This means the user can install a single
+    backend for ``numpy`` and have it implement ``numpy.scipy.ndimage`` as well.
 
     .. versionadded:: 1.8.0
     """
