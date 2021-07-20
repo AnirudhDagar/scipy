@@ -10,6 +10,10 @@ from ._arraytools import const_ext, even_ext, odd_ext, zero_ext
 import warnings
 
 
+# Required by Aray-API
+from scipy._lib._array_api_util import get_namespace
+
+
 __all__ = ['periodogram', 'welch', 'lombscargle', 'csd', 'coherence',
            'spectrogram', 'stft', 'istft', 'check_COLA', 'check_NOLA']
 
@@ -445,6 +449,8 @@ def welch(x, fs=1.0, window='hann', nperseg=None, noverlap=None, nfft=None,
     >>> plt.show()
 
     """
+    xp = get_namespace(x)
+
     freqs, Pxx = csd(x, x, fs=fs, window=window, nperseg=nperseg,
                      noverlap=noverlap, nfft=nfft, detrend=detrend,
                      return_onesided=return_onesided, scaling=scaling,
