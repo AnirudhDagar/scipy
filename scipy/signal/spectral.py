@@ -449,6 +449,9 @@ def welch(x, fs=1.0, window='hann', nperseg=None, noverlap=None, nfft=None,
     >>> plt.show()
 
     """
+
+    # Retrieves standard namespace.
+    # See https://numpy.org/neps/nep-0047-array-api-standard.html#adoption-in-downstream-libraries
     xp = get_namespace(x)
 
     freqs, Pxx = csd(x, x, fs=fs, window=window, nperseg=nperseg,
@@ -585,6 +588,11 @@ def csd(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None, nfft=None,
     >>> plt.show()
 
     """
+    # Retrieves standard namespace.
+    # See https://numpy.org/neps/nep-0047-array-api-standard.html#adoption-in-downstream-libraries
+    xp = get_namespace(x)
+    # TODO: Refactor from np to xp namespace
+    
     freqs, _, Pxy = _spectral_helper(x, y, fs, window, nperseg, noverlap, nfft,
                                      detrend, return_onesided, scaling, axis,
                                      mode='psd')
