@@ -158,13 +158,13 @@ Backend control
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from ._filters import *
-from ._fourier import *
-from ._interpolation import *
-from ._measurements import *
-from ._morphology import *
 from ._multimethods import *
 from ._backend import *
+from . import filters
+from . import fourier
+from . import interpolation
+from . import measurements
+from . import morphology
 
 __version__ = '2.0'
 
