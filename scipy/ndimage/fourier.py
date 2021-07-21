@@ -1,7 +1,8 @@
 from . import _multimethods
+from ._multimethods import (fourier_gaussian, fourier_uniform,
+                            fourier_ellipsoid, fourier_shift)
 
-__all__ = ['fourier_gaussian', 'fourier_uniform', 'fourier_ellipsoid',
-           'fourier_shift']
+__all__ = [s for s in dir() if not s.startswith("_")]
 
 def __dir__():
     return __all__

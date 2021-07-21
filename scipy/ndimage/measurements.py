@@ -1,9 +1,11 @@
 from . import _multimethods
+from ._multimethods import (label, find_objects, labeled_comprehension,
+                            sum, mean, variance, standard_deviation, minimum,
+                            maximum, median, minimum_position,
+                            maximum_position, extrema, center_of_mass,
+                            histogram, watershed_ift, sum_labels)
 
-__all__ = ['label', 'find_objects', 'labeled_comprehension', 'sum', 'mean',
-           'variance', 'standard_deviation', 'minimum', 'maximum', 'median',
-           'minimum_position', 'maximum_position', 'extrema', 'center_of_mass',
-           'histogram', 'watershed_ift', 'sum_labels']
+__all__ = [s for s in dir() if not s.startswith("_")]
 
 
 def __dir__():

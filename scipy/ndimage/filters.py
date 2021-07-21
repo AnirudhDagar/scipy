@@ -1,13 +1,14 @@
 from . import _multimethods
+from ._multimethods import (correlate1d, convolve1d, gaussian_filter1d,
+                            gaussian_filter, prewitt, sobel, generic_laplace,
+                            laplace, gaussian_laplace, generic_filter,
+                            generic_gradient_magnitude, generic_filter1d,
+                            gaussian_gradient_magnitude, correlate, convolve,
+                            uniform_filter1d, uniform_filter, minimum_filter1d,
+                            maximum_filter1d, minimum_filter, maximum_filter,
+                            rank_filter, median_filter, percentile_filter)
 
-__all__ = ['correlate1d', 'convolve1d', 'gaussian_filter1d', 'gaussian_filter',
-           'prewitt', 'sobel', 'generic_laplace', 'laplace',
-           'gaussian_laplace', 'generic_gradient_magnitude',
-           'gaussian_gradient_magnitude', 'correlate', 'convolve',
-           'uniform_filter1d', 'uniform_filter', 'minimum_filter1d',
-           'maximum_filter1d', 'minimum_filter', 'maximum_filter',
-           'rank_filter', 'median_filter', 'percentile_filter',
-           'generic_filter1d', 'generic_filter']
+__all__ = [s for s in dir() if not s.startswith("_")]
 
 
 def __dir__():

@@ -1,7 +1,9 @@
 from . import _multimethods
+from ._multimethods import (spline_filter1d, spline_filter,
+                            geometric_transform, map_coordinates,
+                            affine_transform, shift, zoom, rotate)
 
-__all__ = ['spline_filter1d', 'spline_filter', 'geometric_transform',
-           'map_coordinates', 'affine_transform', 'shift', 'zoom', 'rotate']
+__all__ = [s for s in dir() if not s.startswith("_")]
 
 
 def __dir__():
