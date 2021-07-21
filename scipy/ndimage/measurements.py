@@ -33,7 +33,7 @@ import numpy as np
 from . import _ni_support
 from . import _ni_label
 from . import _nd_image
-from . import _morphology
+from . import morphology
 
 __all__ = ['label', 'find_objects', 'labeled_comprehension', 'sum', 'mean',
            'variance', 'standard_deviation', 'minimum', 'maximum', 'median',
@@ -177,7 +177,7 @@ def label(input, structure=None, output=None):
     if numpy.iscomplexobj(input):
         raise TypeError('Complex type not supported')
     if structure is None:
-        structure = _morphology.generate_binary_structure(input.ndim, 1)
+        structure = morphology.generate_binary_structure(input.ndim, 1)
     structure = numpy.asarray(structure, dtype=bool)
     if structure.ndim != input.ndim:
         raise RuntimeError('structure and input must have equal rank')
@@ -1510,7 +1510,7 @@ def watershed_ift(input, markers, structure=None, output=None):
         raise TypeError('only 8 and 16 unsigned inputs are supported')
 
     if structure is None:
-        structure = _morphology.generate_binary_structure(input.ndim, 1)
+        structure = morphology.generate_binary_structure(input.ndim, 1)
     structure = numpy.asarray(structure, dtype=bool)
     if structure.ndim != input.ndim:
         raise RuntimeError('structure and input must have equal rank')
