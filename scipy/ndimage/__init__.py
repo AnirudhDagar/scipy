@@ -116,6 +116,16 @@ Morphology
    morphological_laplace
    white_tophat
 
+Backend control
+===============
+.. autosummary::
+   :toctree: generated/
+
+   set_backend - Context manager to set the backend within a fixed scope
+   skip_backend - Context manager to skip a backend within a fixed scope
+   set_global_backend - Sets the global ndimage backend
+   register_backend - Register a backend for permanent use
+
 """
 
 # Copyright (C) 2003-2005 Peter J. Verveer
@@ -148,11 +158,14 @@ Morphology
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from ._filters import *
-from ._fourier import *
-from ._interpolation import *
-from ._measurements import *
-from ._morphology import *
+from ._multimethods import *
+from ._backend import *
+from . import filters
+from . import fourier
+from . import interpolation
+from . import measurements
+from . import morphology
+
 
 __version__ = '2.0'
 
