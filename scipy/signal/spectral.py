@@ -1930,11 +1930,10 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
         # All the same operations on the y data
         result_y = _fft_helper(y, win, detrend_func, nperseg, noverlap, nfft,
                                sides)
-        # Array-API np.conjugate still works with torch tensors
-        # Hence there is no need to use torch.conj here and special case this.
-        result = np.conjugate(result) * result_y
+        # Array-API conj is alias to conjugate in numpy so rewriting below with conj
+        result = xp.conj(result) * result_y
     elif mode == 'psd':
-        result = np.conjugate(result) * result
+        result = xp.conj(result) * result
 
     result *= scale
     if sides == 'onesided' and mode == 'psd':
