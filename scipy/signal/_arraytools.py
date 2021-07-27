@@ -97,10 +97,14 @@ def odd_ext(x, n, axis=-1):
     left_ext = axis_slice(x, start=n, stop=0, step=-1, axis=axis)
     right_end = axis_slice(x, start=-1, axis=axis)
     right_ext = axis_slice(x, start=-2, stop=-(n + 2), step=-1, axis=axis)
-    ext = np.concatenate((2 * left_end - left_ext,
-                          x,
-                          2 * right_end - right_ext),
-                         axis=axis)
+    # Array-API
+    # Note: Array-API Supports concat function as one of the manipulation functions
+    # but pytorch has no support for concat (pytorch has cat & numpy has concatenate)
+    # I've monkey patched this specifically while retrieving the namespace.
+    ext = xp.concat((2 * left_end - left_ext,
+                     x,
+                     2 * right_end - right_ext),
+                     axis=axis)
     return ext
 
 
@@ -146,10 +150,14 @@ def even_ext(x, n, axis=-1):
                          % (n, x.shape[axis] - 1))
     left_ext = axis_slice(x, start=n, stop=0, step=-1, axis=axis)
     right_ext = axis_slice(x, start=-2, stop=-(n + 2), step=-1, axis=axis)
-    ext = np.concatenate((left_ext,
+    # Array-API
+    # Note: Array-API Supports concat function as one of the manipulation functions
+    # but pytorch has no support for concat (pytorch has cat & numpy has concatenate)
+    # I've monkey patched this specifically while retrieving the namespace.
+    ext = xp.concatenate((left_ext,
                           x,
                           right_ext),
-                         axis=axis)
+                          axis=axis)
     return ext
 
 
@@ -200,10 +208,14 @@ def const_ext(x, n, axis=-1):
     left_ext = ones * left_end
     right_end = axis_slice(x, start=-1, axis=axis)
     right_ext = ones * right_end
-    ext = np.concatenate((left_ext,
-                          x,
-                          right_ext),
-                         axis=axis)
+    # Array-API
+    # Note: Array-API Supports concat function as one of the manipulation functions
+    # but pytorch has no support for concat (pytorch has cat & numpy has concatenate)
+    # I've monkey patched this specifically while retrieving the namespace.
+    ext = xp.concat((left_ext,
+                     x,
+                     right_ext),
+                     axis=axis)
     return ext
 
 
@@ -236,6 +248,7 @@ def zero_ext(x, n, axis=-1):
         return x
     zeros_shape = list(x.shape)
     zeros_shape[axis] = n
-    zeros = np.zeros(zeros_shape, dtype=x.dtype)
-    ext = np.concatenate((zeros, x, zeros), axis=axis)
+    # Array-API
+    zeros = xp.zeros(zeros_shape, dtype=x.dtype)
+    ext = xp.concat((zeros, x, zeros), axis=axis)
     return ext
