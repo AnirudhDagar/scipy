@@ -8,6 +8,7 @@ from .windows import get_window
 from ._spectral import _lombscargle
 from ._arraytools import const_ext, even_ext, odd_ext, zero_ext
 import warnings
+import torch
 
 
 # Required by Aray-API
@@ -452,14 +453,20 @@ def welch(x, fs=1.0, window='hann', nperseg=None, noverlap=None, nfft=None,
 
     # Retrieves standard namespace.
     # See https://numpy.org/neps/nep-0047-array-api-standard.html#adoption-in-downstream-libraries
-    xp = get_namespace(x)
+    
+    # Aray-API
+    # Note: `get_namespace` is actually not needed here. I'm just adding to make sure
+    # all the functions that are tweaked for array-api are easily searchable later.
 
     freqs, Pxx = csd(x, x, fs=fs, window=window, nperseg=nperseg,
                      noverlap=noverlap, nfft=nfft, detrend=detrend,
                      return_onesided=return_onesided, scaling=scaling,
                      axis=axis, average=average)
 
-    return freqs, Pxx.real
+    # PyTorch won't allow calling real non complex dtype
+    if np.iscomplexobj(Pxx):
+            Pxx = result.real
+    return freqs, Pxx
 
 
 def csd(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None, nfft=None,
@@ -588,33 +595,66 @@ def csd(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None, nfft=None,
     >>> plt.show()
 
     """
+    # Aray-API
     # Retrieves standard namespace.
     # See https://numpy.org/neps/nep-0047-array-api-standard.html#adoption-in-downstream-libraries
     xp = get_namespace(x)
-    # TODO: Refactor from np to xp namespace
     
     freqs, _, Pxy = _spectral_helper(x, y, fs, window, nperseg, noverlap, nfft,
                                      detrend, return_onesided, scaling, axis,
                                      mode='psd')
 
     # Average over windows.
-    if len(Pxy.shape) >= 2 and Pxy.size > 0:
+    # Array-API says size, but pytorch has numel()
+    if xp == torch:
+        num_elems = Pxy.numel()
+    else:
+        num_elems = Pxy.size
+
+
+    if len(Pxy.shape) >= 2 and num_elems > 0:
         if Pxy.shape[-1] > 1:
             if average == 'median':
-                # np.median must be passed real arrays for the desired result
+                # np.median must be passed real arrays for the desired result                
+                # Special case pytorch and deviation needed from array-api
+                # since PyTorch has `iscomplex` whereas numpy has `iscomplexobj`
+                # Note: Array-API doesn't support complex dtypes yet.
+
+                # IMPORTANT: But this also works just fine for both torch and numpy arrays
+                # Why it works?
+                # https://github.com/numpy/numpy/blob/v1.21.0/numpy/lib/type_check.py#L303-L341
+                # Also, see the commented out code below for the alternative more explicit implementation.
                 if np.iscomplexobj(Pxy):
-                    Pxy = (np.median(np.real(Pxy), axis=-1)
-                           + 1j * np.median(np.imag(Pxy), axis=-1))
-                    Pxy /= _median_bias(Pxy.shape[-1])
+                    Pxy = (xp.median(xp.real(Pxy), axis=-1)
+                           + 1j * xp.median(xp.imag(Pxy), axis=-1))
+                    # need to pass namespace in _median_bias to make sure
+                    # the implementation is using the right array library
+                    # By default it has been set to numpy.
+                    Pxy /= _median_bias(Pxy.shape[-1], xp=xp)
                 else:
-                    Pxy = np.median(Pxy, axis=-1) / _median_bias(Pxy.shape[-1])
+                    Pxy = xp.median(Pxy, axis=-1) / _median_bias(Pxy.shape[-1], xp=xp)
+
+                # I've special case torch here instead of monkey patching the function
+                # xp.iscomplexobj = torch.iscomplex while retrieving the namespace.
+
+                # if isinstance(Pxy, torch.Tensor):
+                #     if torch.iscomplex(Pxy) or np.iscomplexobj(Pxy):
+                #         Pxy = (xp.median(xp.real(Pxy), axis=-1)
+                #                + 1j * xp.median(xp.imag(Pxy), axis=-1))
+                #         # need to pass namespace in _median_bias to make sure
+                #         # the implementation is using the right array library
+                #         # By default it has been set to numpy.
+                #         Pxy /= _median_bias(Pxy.shape[-1], xp=xp)
+                #     else:
+                #         Pxy = xp.median(Pxy, axis=-1) / _median_bias(Pxy.shape[-1], xp=xp)
+
             elif average == 'mean':
                 Pxy = Pxy.mean(axis=-1)
             else:
                 raise ValueError('average must be "median" or "mean", got %s'
                                  % (average,))
         else:
-            Pxy = np.reshape(Pxy, Pxy.shape[:-1])
+            Pxy = xp.reshape(Pxy, Pxy.shape[:-1])
 
     return freqs, Pxy
 
@@ -1681,10 +1721,14 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
 
     .. versionadded:: 0.16.0
     """
+    # Array-API
+    xp = get_namespace(x, y)
+
     if mode not in ['psd', 'stft']:
         raise ValueError("Unknown value for mode %s, must be one of: "
                          "{'psd', 'stft'}" % mode)
 
+    # All these functions are now compatible with Array-API
     boundary_funcs = {'even': even_ext,
                       'odd': odd_ext,
                       'constant': const_ext,
@@ -1704,12 +1748,23 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
     axis = int(axis)
 
     # Ensure we have np.arrays, get outdtype
-    x = np.asarray(x)
+    # Array-API
+    # Note: Array-API Supports asarray function in one of the creation functions
+    # but pytorch has no support for asarray, instead it is called `as_tensor` in
+    # pytorch. I've monkey patched this specifically while retrieving the namespace. 
+    x = xp.asarray(x)
     if not same_data:
-        y = np.asarray(y)
-        outdtype = np.result_type(x, y, np.complex64)
+        y = xp.asarray(y)
+        # Note: This won't work with torch.result_type although the same function
+        # exists in both numpy and torch. PyTorch doesn't accept dtypes unlike numpy
+        # See https://numpy.org/doc/stable/reference/generated/numpy.result_type.html
+        # See https://pytorch.org/docs/1.9.0/generated/torch.result_type.html
+        # Hence I'm changing the code here here.
+        # outdtype = np.result_type(x, y, np.complex64)  # original line
+        outdtype = xp.result_type(x, y, xp.asarray([0], dtype=xp.complex64))
     else:
-        outdtype = np.result_type(x, np.complex64)
+        # outdtype = np.result_type(x, np.complex64)  # original line
+        outdtype = xp.result_type(x, xp.asarray([0], dtype=xp.complex64))
 
     if not same_data:
         # Check if we can broadcast the outer axes together
@@ -1718,24 +1773,33 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
         xouter.pop(axis)
         youter.pop(axis)
         try:
-            outershape = np.broadcast(np.empty(xouter), np.empty(youter)).shape
+            # Array-API
+            outershape = xp.broadcast(xp.empty(xouter), xp.empty(youter)).shape
         except ValueError as e:
             raise ValueError('x and y cannot be broadcast together.') from e
 
     if same_data:
         if x.size == 0:
-            return np.empty(x.shape), np.empty(x.shape), np.empty(x.shape)
+            return xp.empty(x.shape), xp.empty(x.shape), xp.empty(x.shape)
     else:
         if x.size == 0 or y.size == 0:
             outshape = outershape + (min([x.shape[axis], y.shape[axis]]),)
-            emptyout = np.rollaxis(np.empty(outshape), -1, axis)
+            # Array-API
+            # Remove use of rollaxis. Replace it with moveaxis
+            # See https://numpy.org/doc/stable/reference/generated/numpy.rollaxis.html
+            # rollaxis is just there for BC in numpy. It is not present in torch.
+            emptyout = xp.moveaxis(xp.empty(outshape), -1, axis)
             return emptyout, emptyout, emptyout
 
     if x.ndim > 1:
         if axis != -1:
-            x = np.rollaxis(x, axis, len(x.shape))
+            # Array-API
+            # TODO: Need to fix the logic here.
+            # moveaxis is not a drop-in replacement for rollaxis
+            # For the demos this condition is never hit, so ignoring for sometime.
+            x = xp.moveaxis(x, axis, len(x.shape))
             if not same_data and y.ndim > 1:
-                y = np.rollaxis(y, axis, len(y.shape))
+                y = xp.moveaxis(y, axis, len(y.shape))
 
     # Check if x and y are the same length, zero-pad if necessary
     if not same_data:
@@ -1743,11 +1807,11 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
             if x.shape[-1] < y.shape[-1]:
                 pad_shape = list(x.shape)
                 pad_shape[-1] = y.shape[-1] - x.shape[-1]
-                x = np.concatenate((x, np.zeros(pad_shape)), -1)
+                x = xp.concat((x, xp.zeros(pad_shape)), -1)
             else:
                 pad_shape = list(y.shape)
                 pad_shape[-1] = x.shape[-1] - y.shape[-1]
-                y = np.concatenate((y, np.zeros(pad_shape)), -1)
+                y = xp.concat((y, xp.zeros(pad_shape)), -1)
 
     if nperseg is not None:  # if specified by user
         nperseg = int(nperseg)
@@ -1755,7 +1819,8 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
             raise ValueError('nperseg must be a positive integer')
 
     # parse window; if array like, then set nperseg = win.shape
-    win, nperseg = _triage_segments(window, nperseg, input_length=x.shape[-1])
+    # Array-API: Need to pass xp here to make sure you choose correct array implementation
+    win, nperseg = _triage_segments(window, nperseg, input_length=x.shape[-1], xp=xp)
 
     if nfft is None:
         nfft = nperseg
@@ -1789,10 +1854,11 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
         # I.e make x.shape[-1] = nperseg + (nseg-1)*nstep, with integer nseg
         nadd = (-(x.shape[-1]-nperseg) % nstep) % nperseg
         zeros_shape = list(x.shape[:-1]) + [nadd]
-        x = np.concatenate((x, np.zeros(zeros_shape)), axis=-1)
+        # Array-API
+        x = xp.concat((x, xp.zeros(zeros_shape)), axis=-1)
         if not same_data:
             zeros_shape = list(y.shape[:-1]) + [nadd]
-            y = np.concatenate((y, np.zeros(zeros_shape)), axis=-1)
+            y = xp.concat((y, xp.zeros(zeros_shape)), axis=-1)
 
     # Handle detrending and window functions
     if not detrend:
@@ -1800,19 +1866,30 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
             return d
     elif not hasattr(detrend, '__call__'):
         def detrend_func(d):
+            # Array-API
+            # TODO: with default arguments this is hit, hence need to support this.
+            # This requires detrend in signaltools to be Array-API compatible. 
             return signaltools.detrend(d, type=detrend, axis=-1)
     elif axis != -1:
         # Wrap this function so that it receives a shape that it could
         # reasonably expect to receive.
         def detrend_func(d):
-            d = np.rollaxis(d, -1, axis)
+            d = xp.moveaxis(d, -1, axis)
             d = detrend(d)
-            return np.rollaxis(d, axis, len(d.shape))
+            # TODO: Need to fix the logic here.
+            # moveaxis is not a drop-in replacement for rollaxis
+            # For the demos this condition is never hit, so ignoring for sometime.
+            return xp.moveaxis(d, axis, len(d.shape))
     else:
         detrend_func = detrend
 
-    if np.result_type(win, np.complex64) != outdtype:
-        win = win.astype(outdtype)
+    if xp.result_type(win, xp.asarray([0], dtype=xp.complex64)) != outdtype:
+        # Array-API needs special case here.
+        if isinstance(result, torch.Tensor):
+            win = win.type(outdtype)
+        else:
+            win = win.astype(outdtype)
+        # win = win.astype(outdtype)
 
     if scaling == 'density':
         scale = 1.0 / (fs * (win*win).sum())
@@ -1822,7 +1899,7 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
         raise ValueError('Unknown scaling: %r' % scaling)
 
     if mode == 'stft':
-        scale = np.sqrt(scale)
+        scale = xp.sqrt(scale)
 
     if return_onesided:
         if np.iscomplexobj(x):
@@ -1840,9 +1917,11 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
         sides = 'twosided'
 
     if sides == 'twosided':
-        freqs = sp_fft.fftfreq(nfft, 1/fs)
+        freqs = xp.fft.fftfreq(nfft, 1/fs)
+        # freqs = sp_fft.fftfreq(nfft, 1/fs)  # orginal call to scipy fft
     elif sides == 'onesided':
-        freqs = sp_fft.rfftfreq(nfft, 1/fs)
+        freqs = xp.fft.rfftfreq(nfft, 1/fs)
+        # freqs = sp_fft.rfftfreq(nfft, 1/fs)  # original call to scipy fft
 
     # Perform the windowed FFTs
     result = _fft_helper(x, win, detrend_func, nperseg, noverlap, nfft, sides)
@@ -1851,6 +1930,8 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
         # All the same operations on the y data
         result_y = _fft_helper(y, win, detrend_func, nperseg, noverlap, nfft,
                                sides)
+        # Array-API np.conjugate still works with torch tensors
+        # Hence there is no need to use torch.conj here and special case this.
         result = np.conjugate(result) * result_y
     elif mode == 'psd':
         result = np.conjugate(result) * result
@@ -1863,12 +1944,16 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
             # Last point is unpaired Nyquist freq point, don't double
             result[..., 1:-1] *= 2
 
-    time = np.arange(nperseg/2, x.shape[-1] - nperseg/2 + 1,
+    time = xp.arange(nperseg/2, x.shape[-1] - nperseg/2 + 1,
                      nperseg - noverlap)/float(fs)
     if boundary is not None:
         time -= (nperseg/2) / fs
 
-    result = result.astype(outdtype)
+    # Array-API needs special case here.
+    if isinstance(result, torch.Tensor):
+        result = result.type(outdtype)
+    else:
+        result = result.astype(outdtype)
 
     # All imaginary parts are zero anyways
     if same_data and mode != 'stft':
@@ -1880,7 +1965,9 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
         axis -= 1
 
     # Roll frequency axis back to axis where the data came from
-    result = np.rollaxis(result, -1, axis)
+    # Array-API
+    result = xp.moveaxis(result, -1, axis)
+    # result = np.rollaxis(result, -1, axis)
 
     return freqs, time, result
 
@@ -1907,16 +1994,26 @@ def _fft_helper(x, win, detrend_func, nperseg, noverlap, nfft, sides):
 
     .. versionadded:: 0.16.0
     """
+    xp = get_namespace(x)
+
     # Created strided array of data segments
     if nperseg == 1 and noverlap == 0:
-        result = x[..., np.newaxis]
+        result = x[..., None]
+        # result = x[..., np.newaxis] # this also works with torch tensor
     else:
         # https://stackoverflow.com/a/5568169
         step = nperseg - noverlap
-        shape = x.shape[:-1]+((x.shape[-1]-noverlap)//step, nperseg)
-        strides = x.strides[:-1]+(step*x.strides[-1], x.strides[-1])
-        result = np.lib.stride_tricks.as_strided(x, shape=shape,
-                                                 strides=strides)
+        # Array-API Special Casing for torch needed here.
+        # Out of array-api scope
+        if isinstance(x, torch.Tensor):
+            shape = x.shape[:-1]+((x.shape[-1]-noverlap)//step, nperseg)
+            stride = x.stride()[:-1]+(step*x.stride(-1), x.stride(-1))
+            result = torch.as_strided(x, size=shape, stride=stride)
+        else:
+            shape = x.shape[:-1]+((x.shape[-1]-noverlap)//step, nperseg)
+            strides = x.strides[:-1]+(step*x.strides[-1], x.strides[-1])
+            result = np.lib.stride_tricks.as_strided(x, shape=shape,
+                                                     strides=strides)
 
     # Detrend each data segment individually
     result = detrend_func(result)
@@ -1926,16 +2023,21 @@ def _fft_helper(x, win, detrend_func, nperseg, noverlap, nfft, sides):
 
     # Perform the fft. Acts on last axis by default. Zero-pads automatically
     if sides == 'twosided':
-        func = sp_fft.fft
+        func = xp.fft.fft
+        # func = sp_fft.fft
     else:
-        result = result.real
-        func = sp_fft.rfft
+        # real is not implemented for torch tensors with non-complex dtypes.
+        # hence adding an if check for complex dtype here.
+        if np.iscomplexobj(result):
+            result = result.real
+        func = xp.fft.rfft
+        # func = sp_fft.rfft
     result = func(result, n=nfft)
 
     return result
 
 
-def _triage_segments(window, nperseg, input_length):
+def _triage_segments(window, nperseg, input_length, xp=np):
     """
     Parses window and nperseg arguments for spectrogram and _spectral_helper.
     This is a helper function, not meant to be called externally.
@@ -1981,7 +2083,9 @@ def _triage_segments(window, nperseg, input_length):
             nperseg = input_length
         win = get_window(window, nperseg)
     else:
-        win = np.asarray(window)
+        # Array-API
+        # asarray has been monkeypatched for now.
+        win = xp.asarray(window)
         if len(win.shape) != 1:
             raise ValueError('window must be 1-D')
         if input_length < win.shape[-1]:
@@ -1995,7 +2099,7 @@ def _triage_segments(window, nperseg, input_length):
     return win, nperseg
 
 
-def _median_bias(n):
+def _median_bias(n, xp=np):
     """
     Returns the bias of the median of a set of periodograms relative to
     the mean.
@@ -2019,5 +2123,6 @@ def _median_bias(n):
            inspiraling compact binaries", Physical Review D 85, 2012,
            :arxiv:`gr-qc/0509116`
     """
-    ii_2 = 2 * np.arange(1., (n-1) // 2 + 1)
-    return 1 + np.sum(1. / (ii_2 + 1) - 1. / ii_2)
+    # Array-API
+    ii_2 = 2 * xp.arange(1., (n-1) // 2 + 1)
+    return 1 + xp.sum(1. / (ii_2 + 1) - 1. / ii_2)
