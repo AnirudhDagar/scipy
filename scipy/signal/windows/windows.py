@@ -3,8 +3,13 @@
 import operator
 import warnings
 
+import math
 import numpy as np
 from scipy import linalg, special, fft as sp_fft
+
+# Required by Aray-API
+from scipy._lib._array_api_util import get_namespace
+
 
 __all__ = ['boxcar', 'triang', 'parzen', 'bohman', 'blackman', 'nuttall',
            'blackmanharris', 'flattop', 'bartlett', 'hanning', 'barthann',
@@ -107,13 +112,13 @@ def general_cosine(M, a, sym=True):
     >>> plt.show()
     """
     if _len_guards(M):
-        return np.ones(M)
+        return xp.ones(M)
     M, needs_trunc = _extend(M, sym)
 
-    fac = np.linspace(-np.pi, np.pi, M)
-    w = np.zeros(M)
+    fac = xp.linspace(-np.pi, np.pi, M)
+    w = xp.zeros(M)
     for k in range(len(a)):
-        w += a[k] * np.cos(k * fac)
+        w += a[k] * xp.cos(k * fac)
 
     return _truncate(w, needs_trunc)
 
@@ -792,7 +797,7 @@ def hanning(*args, **kwargs):
     return hann(*args, **kwargs)
 
 
-def tukey(M, alpha=0.5, sym=True):
+def tukey(M, alpha=0.5, sym=True, use_torch=False):
     r"""Return a Tukey window, also known as a tapered cosine window.
 
     Parameters
@@ -850,27 +855,40 @@ def tukey(M, alpha=0.5, sym=True):
     >>> plt.xlabel("Normalized frequency [cycles per sample]")
 
     """
+    # Functions like these need to special case and handle the implementation
+    # since it doesn't take any array/tensor object as an argument,
+    # instead it takes an `int`, `float` and a `bool` but creates an
+    # array/tensor for returning the output.
+
+    # We add an argument use_torch in such a case.
+
+    if use_torch:
+        import torch
+        xp = get_namespace(torch.zeros(1))
+    else:
+        xp = get_namespace(np.zeros(1))
+
     if _len_guards(M):
-        return np.ones(M)
+        return xp.ones(M)
 
     if alpha <= 0:
-        return np.ones(M, 'd')
+        return xp.ones(M, 'd')
     elif alpha >= 1.0:
         return hann(M, sym=sym)
 
     M, needs_trunc = _extend(M, sym)
 
-    n = np.arange(0, M)
-    width = int(np.floor(alpha*(M-1)/2.0))
+    n = xp.arange(0, M)
+    width = int(math.floor(alpha*(M-1)/2.0))
     n1 = n[0:width+1]
     n2 = n[width+1:M-width-1]
     n3 = n[M-width-1:]
 
-    w1 = 0.5 * (1 + np.cos(np.pi * (-1 + 2.0*n1/alpha/(M-1))))
-    w2 = np.ones(n2.shape)
-    w3 = 0.5 * (1 + np.cos(np.pi * (-2.0/alpha + 1 + 2.0*n3/alpha/(M-1))))
+    w1 = 0.5 * (1 + xp.cos(np.pi * (-1 + 2.0*n1/alpha/(M-1))))
+    w2 = xp.ones(n2.shape)
+    w3 = 0.5 * (1 + xp.cos(np.pi * (-2.0/alpha + 1 + 2.0*n3/alpha/(M-1))))
 
-    w = np.concatenate((w1, w2, w3))
+    w = xp.concat((w1, w2, w3))
 
     return _truncate(w, needs_trunc)
 

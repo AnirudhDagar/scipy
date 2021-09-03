@@ -1885,7 +1885,7 @@ def _spectral_helper(x, y, fs=1.0, window='hann', nperseg=None, noverlap=None,
 
     if xp.result_type(win, xp.asarray([0], dtype=xp.complex64)) != outdtype:
         # Array-API needs special case here.
-        if isinstance(result, torch.Tensor):
+        if isinstance(win, torch.Tensor):
             win = win.type(outdtype)
         else:
             win = win.astype(outdtype)
