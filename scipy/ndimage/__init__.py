@@ -119,7 +119,8 @@ Morphology
 Backend control
 ===============
 
-Library maintainers and developers should also check the handling of ``__ua_convert__``.
+Library maintainers and developers should also check the handling of
+:ref:```__ua_convert__`` with ``uarray`` <uarray>`.
 
 .. autosummary::
    :toctree: generated/
