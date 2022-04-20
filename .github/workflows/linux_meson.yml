@@ -120,10 +120,9 @@ jobs:
           docker pull i386/ubuntu:bionic
           docker run -v $(pwd):/scipy i386/ubuntu:bionic /usr/bin/linux32 /bin/bash -c "cd scipy && \
           apt-get -y update && \
-          apt-get -y install curl python3.8-dev python3.8 python3-distutils pkg-config libpng-dev libjpeg8-dev libfreetype6-dev && \
+          apt-get -y install curl python3.8-dev python3.8 python3-distutils python3-pip pkg-config libpng-dev libjpeg8-dev libfreetype6-dev && \
           python3.8 -m pip install setuptools==59.6.0 ninja meson==0.60.3 numpy==1.18.5 cython pybind11 pytest pytest-timeout pytest-xdist pytest-env pytest-cov coverage codecov gcovr Pillow mpmath pythran==0.10.0 matplotlib scikit-umfpack scikit-sparse --user && \ 
           python3.8 -m pip install meson==0.60.3 && \
-          meson install -h && \
           apt-get -y install gcc-5 g++-5 gfortran-8 wget && \
           cd .. && \
           mkdir openblas && cd openblas && \
