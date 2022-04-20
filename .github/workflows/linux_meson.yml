@@ -122,7 +122,7 @@ jobs:
           apt-get -y update && \
           apt-get -y install curl python3.8-dev python3.8 python3-distutils python3-pip pkg-config libpng-dev libjpeg8-dev libfreetype6-dev gfortran-8 gcc-5 g++-5 wget && \
           python3.8 -m pip install setuptools==59.6.0 ninja numpy==1.18.5 cython pybind11 pytest pytest-timeout pytest-xdist pytest-env pytest-cov coverage codecov gcovr Pillow mpmath pythran==0.10.0 --user && \ 
-          python3.8 -m pip matplotlib scikit-umfpack scikit-sparse --user && \
+          python3.8 -m pip install matplotlib scikit-umfpack scikit-sparse --user && \
           python3.8 -m pip install meson==0.60.3 && \
           cd .. && \
           mkdir openblas && cd openblas && \
