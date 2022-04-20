@@ -26,7 +26,7 @@ jobs:
   test_meson:
     name: Meson build
     # If using act to run CI locally the github object does not exist and the usual skipping should not be enforced
-    # if: "github.repository == 'scipy/scipy' || github.repository == ''"
+    if: "github.repository == 'scipy/scipy' || github.repository == ''"
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -102,3 +102,37 @@ jobs:
       run: |
         export OMP_NUM_THREADS=2
         python dev.py -n -j 2
+
+  Linux_Python_38_32bit_full:
+      name: Linux Python 3.8 32bit
+      # If using act to run CI locally the github object does not exist and the usual skipping should not be enforced
+      if: "github.repository == 'anirudhdagar/scipy' || github.repository == '' && github.event_name == 'pull_request'"
+      runs-on: ubuntu-latest
+
+      steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Run 32-bit Ubuntu Docker Build / Tests
+        run: |
+          set -euo pipefail
+          docker pull i386/ubuntu:bionic
+          docker run -v $(pwd):/scipy i386/ubuntu:bionic /usr/bin/linux32 /bin/bash -c "cd scipy && \
+          apt-get -y update && \
+          apt-get -y install curl python3.8-dev python3.8 python3-distutils pkg-config libpng-dev libjpeg8-dev libfreetype6-dev && \
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+          python3.8 get-pip.py && \
+          pip3 --version && \
+          pip3 install setuptools==59.6.0 wheel numpy==1.18.5 cython==0.29.18 pybind11 pytest==7.0.1 pytest-timeout pytest-xdist pytest-env pytest-cov Pillow mpmath pythran==0.10.0 --user && \
+          apt-get -y install gcc-5 g++-5 gfortran-8 wget && \
+          cd .. && \
+          mkdir openblas && cd openblas && \
+          target=\$(python3.8 ../scipy/tools/openblas_support.py) && \
+          cp -r \$target/lib/* /usr/lib && \
+          cp \$target/include/* /usr/include && \
+          cd ../scipy && \
+          CC=gcc-5 CXX=g++-5 F77=gfortran-8 F90=gfortran-8 pip3 install . && \
+          python3.8 tools/openblas_support.py --check_version $(openblas_version) && \
+          python3.8 runtests.py -n --mode=full -- -n auto -s --junitxml=junit/test-results.xml --cov-config=.coveragerc --cov-report=xml --cov-report=html"
+
