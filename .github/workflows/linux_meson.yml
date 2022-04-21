@@ -113,10 +113,4 @@ jobs:
         with:
           submodules: recursive
       container: i386:ubuntu
-      - name: Verify Docker Run
-        run: |
-          ls
-          uname -r
-          node -v
-          cat /etc/os-release
 
