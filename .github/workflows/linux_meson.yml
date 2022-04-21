@@ -108,27 +108,17 @@ jobs:
       # If using act to run CI locally the github object does not exist and the usual skipping should not be enforced
       if: "github.repository == 'anirudhdagar/scipy' || github.repository == '' && github.event_name == 'pull_request'"
       runs-on: ubuntu-latest
-
       steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-
-      - name: Run 32-bit Ubuntu Docker Build / Tests
-        run: |
-          set -euo pipefail
-          docker pull i386/ubuntu:bionic
-          docker run -v $(pwd):/scipy i386/ubuntu:bionic /usr/bin/linux32 /bin/bash -c "cd scipy && \
-          apt-get -y update && \
-          apt-get -y install curl python3.8-dev python3.8 python3-distutils python3-pip pkg-config libpng-dev libjpeg8-dev libfreetype6-dev gfortran-8 gcc-5 g++-5 wget && \
-          python3.8 -m pip install setuptools==59.6.0 ninja numpy==1.18.5 cython pybind11 pytest pytest-timeout pytest-xdist pytest-env pytest-cov coverage codecov gcovr Pillow mpmath pythran==0.10.0 --user && \
-          python3.8 -m pip install meson==0.60.3 && \
-          cd .. && \
-          mkdir openblas && cd openblas && \
-          target=\$(python3.8 ../scipy/tools/openblas_support.py) && \
-          cp -r \$target/lib/* /usr/lib && \
-          cp \$target/include/* /usr/include && \
-          cd ../scipy && \
-          CC=gcc-5 CXX=g++-5 F77=gfortran-8 F90=gfortran-8 python3.8 dev.py -j 2 --build-only --gcov && \
-          python3.8 dev.py -n -j 2 --mode full --coverage"
+      container:
+        image: i386:ubuntu:bionic
+        steps:
+        - name: Verify Docker Run
+          run: |
+            ls
+            uname -r
+            node -v
+            cat /etc/os-release
 
