@@ -117,13 +117,16 @@ jobs:
       - name: update and install the building tools
         run: |
           apt-get -y update
-          apt-get -y install libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev libmpc-dev
-          apt-get -y install python3.8 python3.8-dev python3.8-distutils python3.8-venv
+          apt-get -y install curl libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev libmpc-dev
+          apt-get -y install python3.8 python3.8-dev python3.8-distutils python3.8-pip
           ls scipy
 
       - name: Install Python packages
         run: |
           python3.8 --version
           which python3.8
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3.8 get-pip.py
+          pip3 --version
           python3.8 -m pip install ninja meson==0.60.3
           # python -m pip install pytest-cov coverage codecov gcovr
