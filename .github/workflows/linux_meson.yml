@@ -132,7 +132,7 @@ jobs:
       - name: Meson 32 build-install
         run: |
           meson --version
-          myvar=`python -c 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'`
+          myvar=`python3.8 -c 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'`
           ls $myvar/../../random/lib
           # python3 dev.py -j 2 --build-only --gcov
 
