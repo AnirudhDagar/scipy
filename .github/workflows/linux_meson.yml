@@ -118,7 +118,7 @@ jobs:
         run: |
           apt-get -y update
           apt-get -y install curl libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libsuitesparse-dev libmpc-dev
-          apt-get -y install python3.8 python3.8-dev python3.8-distutils python3.8-pip
+          apt-get -y install python3.8 python3.8-dev python3.8-distutils
           ls scipy
 
       - name: Install Python packages
