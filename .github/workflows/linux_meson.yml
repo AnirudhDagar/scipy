@@ -112,6 +112,8 @@ jobs:
       image: i386/ubuntu:latest
     steps:
       - uses: actions/checkout@v1
+        with:
+          submodules: recursive
       - name: update and install the building tools
         run: |
           apt update
