@@ -131,7 +131,7 @@ jobs:
       - name: Meson 32 build-install
         run: |
           meson --version
-          python3.8 dev.py -j 2 --build-only --gcov
+          python3.8 dev.py -j 2 --gcov
 
       - name: Test SciPy
         run: |
