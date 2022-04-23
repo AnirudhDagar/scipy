@@ -133,13 +133,14 @@ jobs:
         run: |
           meson --version
           myvar=`python3.8 -c 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'`
-          ls $myvar/../../random/lib
-          # python3 dev.py -j 2 --build-only --gcov
+          ls $myvar/../../
+          ls $myvar/../../random
+          # python3.8 dev.py -j 2 --build-only --gcov
 
       - name: Test SciPy
         run: |
           export OPENBLAS_NUM_THREADS=1
-          # python3 dev.py -n -j 2 --mode full --coverage
+          # python3.8 dev.py -n -j 2 --mode full --coverage
 
 # set -euo pipefail
 # docker pull i386/ubuntu:bionic
