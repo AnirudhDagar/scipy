@@ -123,17 +123,23 @@ jobs:
 
       - name: Install Python packages
         run: |
-          python3.8 --version
-          which python3.8
           curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
           python3.8 get-pip.py
           pip3 --version
-          pip3 install setuptools wheel numpy==1.18.5 cython pytest pytest-xdist pybind11 mpmath gmpy2 pythran ninja meson==0.60.3
+          pip3 install setuptools wheel numpy==1.18.5 cython pytest pytest-xdist pybind11 mpmath gmpy2 pythran threadpoolctl ninja meson==0.60.3
+          pip3 install matplotlib scikit-umfpack scikit-sparse
+          pip3 uninstall -y scipy
           pip3 install pytest-cov coverage codecov gcovr
 
       - name: Meson 32 build-install
         run: |
           meson --version
+          python3 dev.py -j 2 --build-only --gcov
+
+      - name: Test SciPy
+        run: |
+          export OPENBLAS_NUM_THREADS=1
+          python3 dev.py -n -j 2 --mode full --coverage
 
 # set -euo pipefail
 # docker pull i386/ubuntu:bionic
