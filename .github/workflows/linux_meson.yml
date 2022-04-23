@@ -128,7 +128,7 @@ jobs:
           pip3 --version
           pip3 install setuptools wheel cython pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath gmpy2 pythran threadpoolctl ninja meson==0.60.3
           pip3 install pytest-cov coverage codecov gcovr
-          pip3 install numpy
+          pip3 install numpy==1.18.5
 
       - name: Meson 32 build-install
         run: |
