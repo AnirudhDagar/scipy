@@ -114,9 +114,13 @@ jobs:
       - uses: actions/checkout@v1
         with:
           submodules: recursive
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
       - name: update and install the building tools
         run: |
-          apt update
-          apt install -y build-essential
           ls scipy
-
+          which python
+          python -v
+          python -c "import os; print("hello")"
