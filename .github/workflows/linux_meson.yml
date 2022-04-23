@@ -127,8 +127,6 @@ jobs:
           python3.8 get-pip.py
           pip3 --version
           pip3 install setuptools wheel numpy==1.18.5 cython pytest pytest-xdist pybind11 mpmath gmpy2 pythran threadpoolctl ninja meson==0.60.3
-          pip3 install matplotlib scikit-umfpack scikit-sparse
-          pip3 uninstall -y scipy
           pip3 install pytest-cov coverage codecov gcovr
 
       - name: Meson 32 build-install
