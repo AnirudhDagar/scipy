@@ -131,16 +131,12 @@ jobs:
       - name: Meson 32 build-install
         run: |
           meson --version
-          myvar=`python3.8 -c 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'`
-          ls $myvar/../../
-          ls $myvar/../../random
-          ls $myvar/../../random/lib
-          # python3.8 dev.py -j 2 --build-only --gcov
+          python3.8 dev.py -j 2 --build-only --gcov
 
       - name: Test SciPy
         run: |
           export OPENBLAS_NUM_THREADS=1
-          # python3.8 dev.py -n -j 2 --mode full --coverage
+          python3.8 dev.py -n -j 2 --mode full --coverage
 
 # set -euo pipefail
 # docker pull i386/ubuntu:bionic
@@ -162,3 +158,8 @@ jobs:
 # python3.8 tools/openblas_support.py --check_version $(openblas_version) && \
 # python3.8 runtests.py -n --mode=full -- -n auto -s --junitxml=junit/test-results.xml --cov-config=.coveragerc --cov-report=xml --cov-report=html"
 
+
+# myvar=`python3.8 -c 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'`
+# ls $myvar/../../
+# ls $myvar/../../random
+# ls $myvar/../../random/lib
