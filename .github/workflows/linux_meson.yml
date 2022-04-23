@@ -104,13 +104,19 @@ jobs:
         python dev.py -n -j 2
 
   Linux_Python_38_32bit_full:
-      name: Linux Python 3.8 32bit
-      # If using act to run CI locally the github object does not exist and the usual skipping should not be enforced
-      if: "github.repository == 'anirudhdagar/scipy' || github.repository == '' && github.event_name == 'pull_request'"
-      runs-on: ubuntu-latest
-      steps:
+    name: Linux Python 3.8 32bit
+    # If using act to run CI locally the github object does not exist and the usual skipping should not be enforced
+    if: "github.repository == 'anirudhdagar/scipy' || github.repository == '' && github.event_name == 'pull_request'"
+    runs-on: ubuntu-latest
+    container:
+      image: i386/ubuntu:latest
+    steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      container: i386/ubuntu:bionic
+      - name: update and install the building tools
+        run: |
+          apt update
+          apt install -y build-essential
+          ls scipy
 
