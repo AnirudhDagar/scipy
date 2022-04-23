@@ -128,5 +128,9 @@ jobs:
           curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
           python3.8 get-pip.py
           pip3 --version
-          python3.8 -m pip install ninja meson==0.60.3
-          # python -m pip install pytest-cov coverage codecov gcovr
+          pip3 install numpy cython pytest pytest-xdist pybind11 mpmath gmpy2 pythran ninja meson==0.60.3
+          pip3 install pytest-cov coverage codecov gcovr
+
+      - name: Meson 32 build-install
+        run: |
+          meson --version
