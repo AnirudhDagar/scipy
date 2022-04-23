@@ -123,8 +123,8 @@ jobs:
 
       - name: Install Python packages
         run: |
-          python3.8 -v
+          python3.8 --version
           which python
-          python -c "import os; print("hello")"
-          python -m pip install ninja meson==0.60.3
-          python -m pip install pytest-cov coverage codecov gcovr
+          # python -c "import os; print("hello")"
+          # python -m pip install ninja meson==0.60.3
+          # python -m pip install pytest-cov coverage codecov gcovr
