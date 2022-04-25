@@ -110,7 +110,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: i386/ubuntu:latest
-      options: "--entrypoint /bin/bash"
     steps:
       - uses: actions/checkout@v1
         with:
@@ -119,39 +118,39 @@ jobs:
         run: |
           apt-get -y update
           apt-get -y install curl libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libpng-dev libjpeg8-dev libfreetype6-dev libsuitesparse-dev libmpc-dev
-          apt-get -y install python3.8-dev python3.8 python3.8-distutils python3.8-venv pkg-config
+          apt-get -y install python3.8-dev python3.8 python3.8-distutils python3-pip pkg-config
 
       - name: Install Python packages
         run: |
-          python3.8 -m venv meson_test
-          source meson_test/bin/activate
-          pip install --upgrade pip
-          pip install setuptools==59.6.0 wheel numpy==1.19.0 cython pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath gmpy2 pythran threadpoolctl ninja meson==0.60.3 pytest-cov coverage codecov gcovr
-          pip install pytest-cov coverage codecov gcovr
+          pip3 --version
+          python3.8 -m pip install --upgrade pip
+          pip3 --version
+          pip3 install setuptools==59.6.0 wheel numpy==1.19.0 cython pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath gmpy2 pythran threadpoolctl ninja meson==0.60.3
+          pip3 install pytest-cov coverage codecov gcovr
 
       - name: Meson 32 build-install
         run: |
           meson --version
-          python dev.py -j 2 --build-only --gcov
+          python3.8 dev.py -j 2 --build-only --gcov
 
       - name: Test SciPy
         run: |
           export OPENBLAS_NUM_THREADS=1
-          python dev.py -n -j 2 --mode full --coverage
+          python3.8 dev.py -n -j 2 --mode full --coverage
 
-# - name: Upload coverage information
-#   run: |
-#     set -euo pipefail
-#     RUN_DIR=`echo build-install/lib/python*/site-packages`
-#     # Produce gcov output for codecov to find
-#     find build -name '*.gcno' -type f -exec gcov -pb {} +
-#     mv *.gcov "$RUN_DIR/"
-#     # Run codecov
-#     cd "$RUN_DIR"
-#     curl https://codecov.io/bash -o codecov-upload.sh
-#     chmod +x codecov-upload.sh
-#     # Skip running gcov since we have already done it
-#     ./codecov-upload.sh -X gcov
+      - name: Upload coverage information
+        run: |
+          set -euo pipefail
+          RUN_DIR=`echo build-install/lib/python*/site-packages`
+          # Produce gcov output for codecov to find
+          find build -name '*.gcno' -type f -exec gcov -pb {} +
+          mv *.gcov "$RUN_DIR/"
+          # Run codecov
+          cd "$RUN_DIR"
+          curl https://codecov.io/bash -o codecov-upload.sh
+          chmod +x codecov-upload.sh
+          # Skip running gcov since we have already done it
+          ./codecov-upload.sh -X gcov
 
 # set -euo pipefail
 # docker pull i386/ubuntu:bionic
