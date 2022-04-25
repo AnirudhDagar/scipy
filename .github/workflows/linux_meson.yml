@@ -110,6 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: i386/ubuntu:latest
+      options: "--entrypoint /bin/bash"
     steps:
       - uses: actions/checkout@v1
         with:
@@ -123,7 +124,7 @@ jobs:
       - name: Install Python packages
         run: |
           python3.8 -m venv meson_test
-          . meson_test/bin/activate
+          source meson_test/bin/activate
           pip install --upgrade pip
           pip install setuptools==59.6.0 wheel numpy==1.19.0 cython pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath gmpy2 pythran threadpoolctl ninja meson==0.60.3 pytest-cov coverage codecov gcovr
           pip install pytest-cov coverage codecov gcovr
