@@ -138,19 +138,19 @@ jobs:
           export OPENBLAS_NUM_THREADS=1
           python dev.py -n -j 2 --mode full --coverage
 
-      - name: Upload coverage information
-        run: |
-          set -euo pipefail
-          RUN_DIR=`echo build-install/lib/python*/site-packages`
-          # Produce gcov output for codecov to find
-          find build -name '*.gcno' -type f -exec gcov -pb {} +
-          mv *.gcov "$RUN_DIR/"
-          # Run codecov
-          cd "$RUN_DIR"
-          curl https://codecov.io/bash -o codecov-upload.sh
-          chmod +x codecov-upload.sh
-          # Skip running gcov since we have already done it
-          ./codecov-upload.sh -X gcov
+# - name: Upload coverage information
+#   run: |
+#     set -euo pipefail
+#     RUN_DIR=`echo build-install/lib/python*/site-packages`
+#     # Produce gcov output for codecov to find
+#     find build -name '*.gcno' -type f -exec gcov -pb {} +
+#     mv *.gcov "$RUN_DIR/"
+#     # Run codecov
+#     cd "$RUN_DIR"
+#     curl https://codecov.io/bash -o codecov-upload.sh
+#     chmod +x codecov-upload.sh
+#     # Skip running gcov since we have already done it
+#     ./codecov-upload.sh -X gcov
 
 # set -euo pipefail
 # docker pull i386/ubuntu:bionic
