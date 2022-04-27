@@ -394,7 +394,7 @@ def get_project_info():
     except ImportError:
         # this may fail when running with --no-build, so try to detect
         # an installed scipy in a subdir inside a repo
-        site_dir = get_site_packages()
+        site_dir = get_installed_path()
         print("Trying to find scipy from development installed "
               "path at:", site_dir)
         sys.path.insert(0, site_dir)
@@ -557,6 +557,20 @@ def get_site_packages():
     plat_path = Path(get_path('platlib'))
     return str(Path(PATH_INSTALLED) / plat_path.relative_to(sys.exec_prefix))
 
+def get_installed_path():
+    site_dir = get_site_packages()
+    if os.path.exists(site_dir):
+        return site_dir
+    else:
+        # hack to fallback to debian based python dist-packages
+        # see https://github.com/scipy/scipy/issues/16054
+        py_version = f"python3.{sys.version_info[1]}"
+        dist_dir = site_dir.replace(py_version + "/site-packages",
+                                    "python3/dist-packages")
+        if not os.path.exists(dist_dir):
+            raise RuntimeError(f'Expected installation path "{site_dir}" or '
+                               f'"{dist_dir}" does not exist.')
+        return dist_dir
 
 def build_project(args):
     """
@@ -580,8 +594,6 @@ def build_project(args):
 
     setup_build(args, env)
 
-    site_dir = get_site_packages()
-
     cmd = ["ninja", "-C", args.build_dir]
     if args.parallel > 1:
         cmd += ["-j", str(args.parallel)]
@@ -596,6 +608,8 @@ def build_project(args):
         sys.exit(1)
 
     install_project(args)
+
+    site_dir = get_installed_path()
 
     if args.win_cp_openblas and platform.system() == 'Windows':
         if copy_openblas() == 0:
