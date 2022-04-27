@@ -118,14 +118,14 @@ jobs:
         run: |
           apt-get -y update
           apt-get -y install curl libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libpng-dev libjpeg8-dev libfreetype6-dev libsuitesparse-dev libmpc-dev
-          apt-get -y install python3.8-dev python3.8 python3.8-distutils python3-pip pkg-config
+          apt-get -y install python3.8-dev python3.8 python3.8-distutils pkg-config
 
       - name: Install Python packages
         run: |
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3.8 get-pip.py
           pip3 --version
-          python3.8 -m pip install --upgrade pip
-          pip3 --version
-          pip3 install setuptools==59.6.0 wheel numpy==1.19.0 cython pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath gmpy2 pythran threadpoolctl ninja meson==0.60.3
+          pip3 install setuptools==59.6.0 wheel numpy==1.19.0 cython pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath gmpy2 pythran threadpoolctl ninja meson==0.62.0 pytest-cov coverage codecov gcovr
           pip3 install pytest-cov coverage codecov gcovr
 
       - name: Meson 32 build-install
