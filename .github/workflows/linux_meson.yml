@@ -124,9 +124,7 @@ jobs:
         run: |
           curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
           python3.8 get-pip.py
-          pip3 install ninja meson==0.60.3 numpy==1.19.0 cython pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath gmpy2 pythran threadpoolctl
-          pip3 install matplotlib install matplotlib scikit-umfpack scikit-sparse
-          pip3 uninstall -y scipy
+          pip3 install ninja meson==0.60.3 numpy==1.19.0 cython==0.29.18 pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath pythran==0.10.0
           pip3 install pytest-cov coverage codecov gcovr
 
       - name: Meson 32 build-install
