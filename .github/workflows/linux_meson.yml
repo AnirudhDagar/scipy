@@ -124,13 +124,11 @@ jobs:
         run: |
           curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
           python3.8 get-pip.py
-          pip3 --version
-          pip3 install setuptools==59.6.0 wheel numpy==1.19.0 cython pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath gmpy2 pythran threadpoolctl ninja meson==0.60.3 pytest-cov coverage codecov gcovr
+          pip3 install setuptools==59.6.0 wheel numpy==1.19.0 cython pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath gmpy2 pythran threadpoolctl ninja meson==0.60.3
           pip3 install pytest-cov coverage codecov gcovr
 
       - name: Meson 32 build-install
         run: |
-          meson --version
           python3.8 dev.py -j 2 --build-only --gcov
 
       - name: Test SciPy
