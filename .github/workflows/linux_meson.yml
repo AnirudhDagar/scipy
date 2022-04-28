@@ -134,6 +134,7 @@ jobs:
       - name: Test SciPy
         run: |
           export OPENBLAS_NUM_THREADS=1
+          export OMP_NUM_THREADS=2
           python3.8 dev.py -n -j 2 --mode full --coverage
 
       - name: Upload coverage information
