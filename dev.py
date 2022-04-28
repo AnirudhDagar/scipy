@@ -458,11 +458,13 @@ def install_project(args):
     Installs the project after building.
     """
     if os.path.exists(PATH_INSTALLED):
-        installdir = get_site_packages()
+        site_dir = get_site_packages()
+        dist_dir = get_dist_packages(site_dir)
         non_empty = len(os.listdir(PATH_INSTALLED))
-        if non_empty and not os.path.exists(installdir):
-            raise RuntimeError("Can't install in non-empty directory: "
-                               f"'{PATH_INSTALLED}'")
+        if non_empty:
+            if not os.path.exists(site_dir) or not os.path.exists(site_dir):
+                raise RuntimeError("Can't install in non-empty directory: "
+                                   f"'{PATH_INSTALLED}'")
     cmd = ["meson", "install", "-C", args.build_dir]
     log_filename = os.path.join(ROOT_DIR, 'meson-install.log')
     start_time = datetime.datetime.now()
@@ -557,20 +559,26 @@ def get_site_packages():
     plat_path = Path(get_path('platlib'))
     return str(Path(PATH_INSTALLED) / plat_path.relative_to(sys.exec_prefix))
 
+
+def get_dist_packages(site_dir):
+    # Hack: fallback to debian based python dist-packages
+    # See https://github.com/scipy/scipy/issues/16054
+    py_version = f"python3.{sys.version_info[1]}"
+    return site_dir.replace(py_version + "/site-packages",
+                            "python3/dist-packages")
+
+
 def get_installed_path():
     site_dir = get_site_packages()
     if os.path.exists(site_dir):
         return site_dir
     else:
-        # hack to fallback to debian based python dist-packages
-        # see https://github.com/scipy/scipy/issues/16054
-        py_version = f"python3.{sys.version_info[1]}"
-        dist_dir = site_dir.replace(py_version + "/site-packages",
-                                    "python3/dist-packages")
+        dist_dir = get_dist_packages(site_dir)
         if not os.path.exists(dist_dir):
             raise RuntimeError(f'Expected installation path "{site_dir}" or '
                                f'"{dist_dir}" does not exist.')
         return dist_dir
+
 
 def build_project(args):
     """
@@ -609,7 +617,7 @@ def build_project(args):
 
     install_project(args)
 
-    site_dir = get_installed_path()
+    install_dir = get_installed_path()
 
     if args.win_cp_openblas and platform.system() == 'Windows':
         if copy_openblas() == 0:
@@ -618,7 +626,7 @@ def build_project(args):
             print("OpenBLAS copy failed!")
             sys.exit(1)
 
-    return site_dir
+    return install_dir
 
 
 def run_mypy(args):
