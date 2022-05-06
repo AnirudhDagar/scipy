@@ -667,7 +667,7 @@ class Test(Task):
 
         runner, version, mod_path = get_test_runner(PROJECT_MODULE)
         # FIXME: changing CWD is not a good practice
-        with working_dir(installed_path()):
+        with working_dir(installed_path):
             print("Running tests for {} version:{}, installed at:{}".format(
                         PROJECT_MODULE, version, mod_path))
             # runner verbosity - convert bool to int
@@ -942,7 +942,7 @@ TARGETS: Sphinx build targets [default: 'html-scipyorg']
         return {
             'actions': [
                 # move to doc/ so local scipy does not get imported
-                (f'cd doc; env PYTHONPATH="{dirs.get_installed_path()}" '
+                (f'cd doc; env PYTHONPATH="{dirs.site}" '
                  f'make {" ".join(make_params)} {targets}'),
             ],
             'task_dep': task_dep,
@@ -971,7 +971,7 @@ class RefguideCheck(Task):
             cmd += [args.submodule]
         cmd_str = ' '.join(cmd)
         return {
-            'actions': [f'env PYTHONPATH={dirs.get_installed_path()} {cmd_str}'],
+            'actions': [f'env PYTHONPATH={dirs.site} {cmd_str}'],
             'task_dep': ['build'],
             'io': {'capture': False},
         }
