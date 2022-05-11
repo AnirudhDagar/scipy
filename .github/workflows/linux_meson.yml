@@ -102,3 +102,77 @@ jobs:
       run: |
         export OMP_NUM_THREADS=2
         python dev.py -n -j 2
+
+  Linux_Python_38_32bit_full:
+    name: Linux Python 3.8 32bit
+    # If using act to run CI locally the github object does not exist and the usual skipping should not be enforced
+    if: "github.repository == 'anirudhdagar/scipy' || github.repository == '' && github.event_name == 'pull_request'"
+    runs-on: ubuntu-latest
+    container:
+      image: i386/ubuntu:latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: update and install the building tools
+        run: |
+          apt-get -y update
+          apt-get -y install curl libopenblas-dev libatlas-base-dev liblapack-dev gfortran libgmp-dev libmpfr-dev libpng-dev libjpeg8-dev libfreetype6-dev libsuitesparse-dev libmpc-dev
+          apt-get -y install python3.8-dev python3.8 python3.8-distutils pkg-config
+
+      - name: Install Python packages
+        run: |
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          python3.8 get-pip.py
+          pip3 install ninja meson==0.60.3 numpy==1.19.0 cython==0.29.18 pytest pytest-timeout pytest-xdist pytest-env Pillow pybind11 mpmath pythran==0.10.0
+          pip3 install pytest-cov coverage codecov gcovr
+
+      - name: Meson 32 build-install
+        run: |
+          python3.8 dev.py -j 2 --build-only --gcov
+
+      - name: Test SciPy
+        run: |
+          export OPENBLAS_NUM_THREADS=1
+          export OMP_NUM_THREADS=2
+          python3.8 dev.py -n -j 2 --mode full --coverage
+
+      - name: Upload coverage information
+        run: |
+          set -euo pipefail
+          RUN_DIR=`echo build-install/lib/python*/site-packages`
+          # Produce gcov output for codecov to find
+          find build -name '*.gcno' -type f -exec gcov -pb {} +
+          mv *.gcov "$RUN_DIR/"
+          # Run codecov
+          cd "$RUN_DIR"
+          curl https://codecov.io/bash -o codecov-upload.sh
+          chmod +x codecov-upload.sh
+          # Skip running gcov since we have already done it
+          ./codecov-upload.sh -X gcov
+
+# set -euo pipefail
+# docker pull i386/ubuntu:bionic
+# docker run -v $(pwd):/scipy i386/ubuntu:bionic /usr/bin/linux32 /bin/bash -c "cd scipy && \
+# apt-get -y update && \
+# apt-get -y install curl python3.8-dev python3.8 python3-distutils pkg-config libpng-dev libjpeg8-dev libfreetype6-dev && \
+# curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+# python3.8 get-pip.py && \
+# pip3 --version && \
+# pip3 install setuptools==59.6.0 wheel numpy==1.18.5 cython==0.29.18 pybind11 pytest==7.0.1 pytest-timeout pytest-xdist pytest-env pytest-cov Pillow mpmath pythran==0.10.0 --user && \
+# apt-get -y install gcc-5 g++-5 gfortran-8 wget && \
+# cd .. && \
+# mkdir openblas && cd openblas && \
+# target=\$(python3.8 ../scipy/tools/openblas_support.py) && \
+# cp -r \$target/lib/* /usr/lib && \
+# cp \$target/include/* /usr/include && \
+# cd ../scipy && \
+# CC=gcc-5 CXX=g++-5 F77=gfortran-8 F90=gfortran-8 pip3 install . && \
+# python3.8 tools/openblas_support.py --check_version $(openblas_version) && \
+# python3.8 runtests.py -n --mode=full -- -n auto -s --junitxml=junit/test-results.xml --cov-config=.coveragerc --cov-report=xml --cov-report=html"
+
+
+# myvar=`python3.8 -c 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'`
+# ls $myvar/../../
+# ls $myvar/../../random
+# ls $myvar/../../random/lib
