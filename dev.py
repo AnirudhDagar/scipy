@@ -59,8 +59,9 @@ import multiprocessing
 
 # distutils is required to infer meson install path
 # if this needs to be replaced for Python 3.12 support and there's no
-# stdlib alternative, use CmdAction as discussed in gh-16058
-import distutils.command.install
+# stdlib alternative, use the hack discussed in gh-16058
+from distutils import dist
+from distutils.command.install import INSTALL_SCHEMES
 
 # In case we are run from the source directory, we don't want to import the
 # project from there:
@@ -175,12 +176,12 @@ def main(argv):
 
     global PATH_INSTALLED
     build_dir = Path(args.build_dir)
-    install_prefix = args.install_prefix
-    if not install_prefix:
-        install_prefix = build_dir.parent / (build_dir.stem + "-install")
+    install_dir = args.install_prefix
+    if not install_dir:
+        install_dir = build_dir.parent / (build_dir.stem + "-install")
     PATH_INSTALLED = os.path.join(
         os.path.abspath(os.path.dirname(__file__)),
-        install_prefix
+        install_dir
     )
 
     if args.win_cp_openblas and platform.system() != 'Windows':
@@ -554,10 +555,10 @@ def copy_openblas():
 
 
 def get_site_packages():
-    """Depending on whether we have debian python or not, return site_dir path"""
-    if 'deb_system' in distutils.command.install.INSTALL_SCHEMES:
-        # debian patched python in use
-        install_cmd = distutils.dist.Distribution().get_command_obj('install')
+    """Depending on whether we have Debian python or not, return site_dir path"""
+    if 'deb_system' in INSTALL_SCHEMES:
+        # Debian patched python in use
+        install_cmd = dist.Distribution().get_command_obj('install')
         install_cmd.select_scheme('deb_system')
         install_cmd.finalize_options()
         plat_path = Path(install_cmd.install_platlib)
