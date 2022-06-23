@@ -17,7 +17,7 @@ concurrency:
 jobs:
   Python-38-dbg:
     name: Python 3.8-dbg
-    if: "github.repository == 'scipy/scipy' || github.repository == ''"
+    if: "github.repository == 'anirudhdagar/scipy' || github.repository == ''"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
