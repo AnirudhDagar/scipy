@@ -1,9 +1,16 @@
-import pooch
 from scipy.datasets._registry import registry
 from scipy.datasets._fetchers import data
 from scipy.datasets import ascent, face, electrocardiogram
 from numpy.testing import assert_equal, assert_almost_equal
 import os
+import warnings
+
+
+# https://github.com/scipy/scipy/pull/15607#issuecomment-1176457275
+# Silence warning until certifi release fix 
+with warnings.catch_warnings():
+    warnings.filterwarnings(action='ignore', category=DeprecationWarning)
+    import pooch
 
 
 def _has_hash(path, expected_hash):
