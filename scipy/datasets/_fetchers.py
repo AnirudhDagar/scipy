@@ -1,6 +1,12 @@
-import pooch
 from numpy import array, frombuffer, load
 from ._registry import registry, registry_urls
+import warnings
+
+# https://github.com/scipy/scipy/pull/15607#issuecomment-1176457275
+# Silence warning until certifi release fix
+with warnings.catch_warnings():
+    warnings.filterwarnings(action='ignore', category=DeprecationWarning)
+    import pooch
 
 
 data = pooch.create(
