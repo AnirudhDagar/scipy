@@ -18,7 +18,7 @@ data = pooch.create(
     # The remote data is on Github
     # base_url is a required param, even though we override this
     # using individual urls in the registry.
-    base_url="https://github.com/scipy-datasets/",
+    base_url="https://github.com/scipy/",
     registry=registry,
     urls=registry_urls
 )

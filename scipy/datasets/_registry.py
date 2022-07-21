@@ -12,7 +12,7 @@ registry = {
 }
 
 registry_urls = {
-    "ascent.dat": "https://raw.githubusercontent.com/scipy-datasets/dataset-ascent/main/ascent.dat",
-    "ecg.dat": "https://raw.githubusercontent.com/scipy-datasets/dataset-ecg/main/ecg.dat",
-    "face.dat": "https://raw.githubusercontent.com/scipy-datasets/dataset-face/main/face.dat"
+    "ascent.dat": "https://raw.githubusercontent.com/scipy/dataset-ascent/main/ascent.dat",
+    "ecg.dat": "https://raw.githubusercontent.com/scipy/dataset-ecg/main/ecg.dat",
+    "face.dat": "https://raw.githubusercontent.com/scipy/dataset-face/main/face.dat"
 }
