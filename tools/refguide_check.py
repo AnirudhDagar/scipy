@@ -86,7 +86,6 @@ PUBLIC_SUBMODULES = [
     'linalg.blas',
     'linalg.lapack',
     'linalg.interpolative',
-    'misc',
     'ndimage',
     'odr',
     'optimize',
@@ -119,7 +118,6 @@ DOCTEST_SKIPLIST = set([
     'scipy.stats.kstwobign',  # inaccurate cdf or ppf
     'scipy.stats.levy_stable',
     'scipy.special.sinc',  # comes from numpy
-    'scipy.misc.who',  # comes from numpy
     'scipy.optimize.show_options',
     'io.rst',   # XXX: need to figure out how to deal w/ mat files
 ])
